@@ -1,0 +1,13 @@
+{
+  "name": "irma_js",
+  "version": "0.0.1",
+  "description": "Client and server javascript for IRMA",
+  "author": "Wouter Lueks, Radboud University",
+  "license": "BSD-3-Clause",
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "babelify": "^7.2.0",
+    "grunt-browserify": "^3.8.0",
+    "grunt-contrib-watch": "^0.6.1"
+  }
+}
