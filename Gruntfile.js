@@ -12,6 +12,11 @@ module.exports = function (grunt) {
                 ]
             },
             client: {
+                options: {
+                    browserifyOptions: {
+                        standalone: "irma"
+                    }
+                },
                 files: {
                     "./build/client/bundle.js": ["./client/demo.js"]
                 }
