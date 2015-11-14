@@ -13,33 +13,37 @@ module.exports = function (grunt) {
             },
             client: {
                 files: {
-                    "./build/client/irma.js": ["./client/irma.js"]
+                    "./build/client/bundle.js": ["./client/demo.js"]
                 }
             },
             server: {
                 files: {
-                    "./build/server/irma.js": ["./server/irma.js"]
+                    "./build/server/bundle.js": ["./server/irma.js"]
                 }
             }
         },
         copy: {
             client: {
                 cwd: "client",
-                src: "**/*",
+                src: ["**/*", "!**/*.{js,scss}"],
                 dest: "build/client",
                 expand: "true"
             },
-            server : {
+            server: {
                 cwd: "server",
-                src: "**/*",
+                src: ["**/*", "!**/*.{js,scss}"],
                 dest: "build/server",
                 expand: "true"
             }
         },
         watch: {
             scripts: {
-                files: ["./client/*.js"],
-                tasks: ["browserify", "copy"]
+                files: ["./{client,server}/*.js"],
+                tasks: ["browserify"]
+            },
+            webfiles: {
+                files: ["./{client,server}/**/*", "!./{client,server}/**/*.{js|scss}"],
+                tasks: ["copy"]
             }
         }
     });

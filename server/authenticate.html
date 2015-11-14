@@ -1,0 +1,26 @@
+<html>
+    <head>
+        <title>IRMA Authentication</title>
+        <script language="javascript" type="text/javascript">
+            function sendMessage(){
+                var data = {
+                    status: "success",
+                    message: document.getElementById("msg").value
+                };
+                window.opener.postMessage(data, "*");
+                console.log("Send message: " + JSON.stringify(data));
+                close();
+            }
+            function sendError() {
+                var data = {};
+                data.status = "error";
+                data.message = "Authentication denied";
+            }
+        </script>
+    </head>
+    <body>
+        <input type="text" id="msg" placeholder="Type something cool" />
+        <button onclick="sendMessage();">Authenticate</button>
+        <button onclick="sendError();">Error</button>
+    </body>
+</html>

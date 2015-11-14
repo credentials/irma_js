@@ -1,2 +1,26 @@
 IRMA javascript client
 ======================
+
+Just some temporary notes. While developping, just run
+
+    grunt
+
+it'll automatically watch the source files and dump the compiled outputs into `build/`.
+
+Alternatively, you can call
+
+    grunt build
+
+to make a single build.
+
+## Development tools
+
+You may also need to install some development tools. Run
+
+    npm install -g grunt-cli
+
+to install Grunt. Run
+
+    npm install
+
+to download the desired node packages (I think ;)).
