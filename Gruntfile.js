@@ -22,6 +22,19 @@ module.exports = function (grunt) {
                 }
             }
         },
+        sass: {
+            options: {
+                sourcemap: false,
+                compress: false,
+                yuicompress: false,
+                style: 'expanded',
+            },
+            server: {
+                files: {
+                    "./build/server/css/irma.css": "server/sass/irma.scss"
+                }
+            }
+        },
         copy: {
             client: {
                 cwd: "client",
@@ -41,6 +54,10 @@ module.exports = function (grunt) {
                 files: ["./{client,server}/*.js"],
                 tasks: ["browserify"]
             },
+            sass: {
+                files: ["./{client,server}/**/*.scss"],
+                tasks: ["sass"]
+            },
             webfiles: {
                 files: ["./{client,server}/**/*", "!./{client,server}/**/*.{js|scss}"],
                 tasks: ["copy"]
@@ -50,9 +67,10 @@ module.exports = function (grunt) {
 
     grunt.loadNpmTasks("grunt-browserify");
     grunt.loadNpmTasks("grunt-babel");
+    grunt.loadNpmTasks("grunt-sass");
     grunt.loadNpmTasks("grunt-contrib-watch");
     grunt.loadNpmTasks("grunt-contrib-copy");
 
     grunt.registerTask("default", ["watch"]);
-    grunt.registerTask("build", ["browserify", "copy"]);
+    grunt.registerTask("build", ["browserify", "sass", "copy"]);
 };
