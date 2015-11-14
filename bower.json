@@ -1,0 +1,25 @@
+{
+  "name": "irma_js",
+  "description": "Client and server javascript for IRMA",
+  "main": "",
+  "authors": [
+    "Wouter Lueks",
+    "Radboud University"
+  ],
+  "license": "BSD-3-Clause",
+  "moduleType": [
+    "es6", "globals"
+  ],
+  "homepage": "https://irmacard.org/",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.4"
+  }
+}

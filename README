@@ -18,9 +18,16 @@ to make a single build.
 You may also need to install some development tools. Run
 
     npm install -g grunt-cli
+    npm install -g bower
 
 to install Grunt. Run
 
     npm install
 
-to download the desired node packages (I think ;)).
+to download the desired node packages (I think ;)). Also, when we are using
+external js libraries (we're not using jQuery for now on the client side at
+least), run
+
+    bower install
+
+first to download these packages.
