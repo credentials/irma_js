@@ -2,6 +2,7 @@
     <head>
         <title>IRMA Authentication</title>
         <link rel="stylesheet" type="text/css" href="css/irma.css">
+        <script type="text/javascript" src="../../bower_components/qrcode.js/qrcode.js"></script>
         <script language="javascript" type="text/javascript">
             function sendMessage(data){
                 window.opener.postMessage(data, "*");
@@ -29,6 +30,14 @@
     <body>
         <h1>IRMA authentication</h1>
         <input type="text" id="msg" placeholder="Type something cool" />
+        <div id="qrcode"></div>
+        <script language="javascript" type="text/javascript">
+            var qrcode = new QRCode("qrcode", {
+                width: 128,
+                height: 128,
+            });
+            qrcode.makeCode("Hello hello hello");
+        </script>
         <button onclick="sendSuccess();">Authenticate</button>
         <button onclick="sendError();">Error</button>
     </body>
