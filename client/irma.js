@@ -23,7 +23,7 @@ function startAuthentication(authDesc, success, failure) {
             failure(e.data.message);
         }
     }, false);
-    var popup = window.open("../server/authenticate.html",'name','height=400,width=600');
+    var popup = window.open("../server/authenticate.html",'name','height=400,width=640');
     if (window.focus) {
         popup.focus();
     }

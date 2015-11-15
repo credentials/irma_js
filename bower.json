@@ -22,6 +22,6 @@
   ],
   "dependencies": {
     "jquery": "~2.1.4",
-    "qrcode.js": "qrcode-js#*"
+    "jquery-qrcode": "jquery.qrcode#~0.12.0"
   }
 }

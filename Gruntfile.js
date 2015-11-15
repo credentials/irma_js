@@ -33,6 +33,7 @@ module.exports = function (grunt) {
                 compress: false,
                 yuicompress: false,
                 style: 'expanded',
+                includePaths: ["bower_components/compass-mixins/lib"],
             },
             server: {
                 files: {
