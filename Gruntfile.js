@@ -14,11 +14,11 @@ module.exports = function (grunt) {
             client: {
                 options: {
                     browserifyOptions: {
-                        standalone: "irma"
+                        standalone: "IRMA"
                     }
                 },
                 files: {
-                    "./build/client/bundle.js": ["./client/demo.js"]
+                    "./build/client/irma.js": ["./client/irma.js"]
                 }
             },
             server: {
@@ -42,6 +42,12 @@ module.exports = function (grunt) {
             }
         },
         copy: {
+            examples: {
+                cwd: "examples",
+                src: ["**/*"],
+                dest: "build/examples",
+                expand: "true"
+            },
             client: {
                 cwd: "client",
                 src: ["**/*", "!**/*.{js,scss}"],
@@ -65,7 +71,11 @@ module.exports = function (grunt) {
                 tasks: ["sass"]
             },
             webfiles: {
-                files: ["./{client,server}/**/*", "!./{client,server}/**/*.{js|scss}"],
+                files: [
+                    "./{client,server}/**/*",
+                    "!./{client,server}/**/*.{js|scss}",
+                    "./examples}/**/*"
+                ],
                 tasks: ["copy"]
             }
         }
