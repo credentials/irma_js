@@ -1,4 +1,8 @@
 module.exports = function (grunt) {
+    var server = grunt.option("server") || "http://localhost:9090";
+    var apiServer = grunt.option("apiServer") || "http://localhost:8080";
+    console.log("Server set to: ", server);
+
     grunt.initConfig({
         browserify: {
             options: {
@@ -42,6 +46,13 @@ module.exports = function (grunt) {
             }
         },
         copy: {
+            // Copying the bower bundles is a bit of a hack
+            bower_bundle: {
+                cwd: "bower_components",
+                src: ["**/*"],
+                dest: "build/bower_components",
+                expand: "true"
+            },
             examples: {
                 cwd: "examples",
                 src: ["**/*"],
@@ -74,7 +85,7 @@ module.exports = function (grunt) {
                 files: [
                     "./{client,server}/**/*",
                     "!./{client,server}/**/*.{js|scss}",
-                    "./examples}/**/*"
+                    "./examples/**/*"
                 ],
                 tasks: ["copy"]
             }
@@ -86,6 +97,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks("grunt-sass");
     grunt.loadNpmTasks("grunt-contrib-watch");
     grunt.loadNpmTasks("grunt-contrib-copy");
+    grunt.loadNpmTasks("grunt-string-replace");
 
     grunt.registerTask("default", ["watch"]);
     grunt.registerTask("build", ["browserify", "sass", "copy"]);
