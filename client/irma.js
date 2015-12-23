@@ -35,6 +35,13 @@ function getSetupFromMetas() {
 function handleMessage(event) {
     var msg = event.data
     console.log("Received message: ", msg);
+
+    // If server page is ready, the server page
+    // was reloaded, reset state machine to Initialized
+    if(msg.type === "serverPageReady") {
+        state = State.Initialized;
+    }
+
     switch(state) {
         case State.Initialized:
             handleMessageInitialized(msg);
@@ -43,7 +50,7 @@ function handleMessage(event) {
             handleMessagePopupReady(msg);
             break;
         case State.Done:
-            handleMessageDone(msg);
+            console.log("Didn't expect a server message in state done");
             break;
         default:
             console.log("Unknown state");
@@ -66,10 +73,10 @@ function handleMessageInitialized(msg) {
     }
 }
 
-function handleMessagePopupReady() {
+function handleMessagePopupReady(msg) {
     switch(msg.type) {
-        case "result":
-            if(e.data.status === "success") {
+        case "verificationResult":
+            if(msg.status === "success") {
                 successCallback(msg.message);
             } else {
                 failureCallback(msg.message);
