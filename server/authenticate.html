@@ -1,7 +1,7 @@
 <html>
     <head>
         <title>IRMA Authentication</title>
-        <meta name="verification-api-server" value="http://localhost:9090/jetty/irma_verification_server/api/v1/">
+        <meta name="verification-api-server" value="http://127.0.0.1:8080/irma_verification_server/api/v1/">
         <link rel="stylesheet" type="text/css" href="css/irma.css">
         <script type="text/javascript" src="../bower_components/jquery/dist/jquery.js"></script>
         <script type="text/javascript" src="../bower_components/jquery-qrcode/dist/jquery.qrcode.js"></script>
@@ -12,7 +12,7 @@
             <div class="irma_content">
                 <img src="img/irma_logo_160px.png" class="irma_logo_top" alt="IRMA logo"></img>
                 <div class="irma_title">showing attribute(s)</div>
-                <p> A website requested that you disclose some IRMA attributes. Either scan the QR code with your phone, or press the card reader button to continue.</p>
+                <p id="irma_text"> A website requested that you disclose some IRMA attributes. Either scan the QR code with your phone, or press the card reader button to continue.</p>
                 <div class="irma_option_container">
                     <div id="qrcode" class="irma_option_box"></div>
                     <div class="irma_option_box">

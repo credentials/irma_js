@@ -1,9 +1,14 @@
 const State = {
     Initialized: Symbol(),
+    Connected: Symbol(),
+    Done: Symbol(),
 }
+
 var state = State.Initialized;
 var verificationRequest;
 var server;
+var ws;
+var sessionId;
 
 function getSetupFromMetas() {
     console.log("Running getSetupFromMetas");
@@ -25,6 +30,10 @@ function handleMessage(event) {
         case State.Initialized:
             console.log("Handling message in initialized state");
             handleMessageInitialized(msg);
+            break;
+        case State.Connected:
+            console.log("Handling message in connected state");
+            console.log("ERROR: didn't expect any message in Connected state");
             break;
         default:
             console.log("Unknown state");
@@ -49,21 +58,39 @@ function handleMessageInitialized(msg) {
 function startVerification() {
     console.log("Verification started: ", verificationRequest);
 
-    $.ajax( server, {
+    $.ajax(server, {
         method: "POST",
         contentType: "application/json",
         data: JSON.stringify(verificationRequest),
-        success: successfct,
+    }).done( function(data, status, request) {
+        console.log("Session Data:", data);
+        sessionId = data.u;
+        showQRCode(data);
+        setupStatusChannel(data);
+    }).fail( function(data, status, request) {
+        failure("The request to the verification server failed", data, status);
     });
 }
 
-function successfct(data, status, request) {
-    console.log("Received verification data from the server, yay");
-    console.log("Server data:", data);
+function finishVerification() {
+    console.log("Verification completed, retrieving token");
 
+    $.ajax(server + sessionId + "/getproof", {
+        contentType: "application/json",
+    }).done( function(data, status, request) {
+        console.log("Proof data:", data);
+        showMessage("Verification finished");
+        sendSuccess(data);
+        window.close();
+    }).fail( function(data, status, request) {
+        failure("Failed to get proof from server", data, status);
+    });
+}
+
+function showQRCode(data) {
     var qrcontents = {
-        v: "1.0",
-        u: server + data
+        v: data.v,
+        u: server + sessionId
     }
 
     $("#qrcode").qrcode({
@@ -72,25 +99,91 @@ function successfct(data, status, request) {
     });
 }
 
+function setupStatusChannel(data) {
+    var url = server.replace(/^http/, "ws") + "status/" + data.u;
+    ws = new WebSocket(url);
+    console.log("Got websocket: ", ws);
+    ws.onmessage = receiveStatusMessage;
+}
+
+function receiveStatusMessage(data) {
+    console.log("STATUS: ", data);
+    var msg = data.data
+    switch(state) {
+        case State.Initialized:
+            handleStatusMessageInitialized(msg);
+            break;
+        case State.Connected:
+            handleStatusMessageConnected(msg);
+            break;
+        default:
+            failure("ERROR: unknown current state", state);
+            break;
+    }
+}
+
+function handleStatusMessageInitialized(msg) {
+    switch(msg) {
+        case "CONNECTED":
+            console.log("Client device has connected with the server");
+            showMessage("Please complete the verification on your IRMA token");
+            $(".irma_option_container").hide();
+            state = State.Connected;
+            break;
+        default:
+            failure("unknown status message in Initialized state", msg);
+            break;
+    }
+}
+
+function handleStatusMessageConnected(msg) {
+    switch(msg) {
+        case "DONE":
+            console.log("Proof is done");
+            state = State.Done;
+            finishVerification();
+            break;
+        default:
+            failure("unknown status message in Connected state");
+            break;
+    }
+}
+
 function sendMessage(data){
     window.opener.postMessage(data, "*");
     console.log("Sent message: " + JSON.stringify(data));
 }
 
-function sendSuccess() {
+function sendSuccess(token) {
     var data = {
+        type: "verificationResult",
         status: "success",
-        message: document.getElementById("msg").value
+        message: token,
     };
     sendMessage(data);
 }
 
 function sendError() {
     var data = {
+        type: "verificationResult",
         status: "error",
         message: "Authentication denied"
     }
     sendMessage(data);
+}
+
+function failure() {
+    console.log("ERROR: ", arguments);
+
+    if(arguments.length > 0) {
+        $(".irma_title").html("ERROR");
+        showMessage("<b>Error: <b> " + arguments[0]);
+        $("#irma_text").add_class("error");
+    }
+}
+
+function showMessage(msg) {
+    $("#irma_text").html(msg);
 }
 
 getSetupFromMetas();
