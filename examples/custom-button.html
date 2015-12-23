@@ -3,11 +3,11 @@
         <title>IRMA Client demo page</title>
         <meta name="IRMA-verification-server" value="../server/">
         <script type="text/javascript" src="../bower_components/jquery/dist/jquery.js"></script>
+        <script type="text/javascript" src="../bower_components/jwt-decode/build/jwt-decode.js"></script>
         <script type="text/javascript" src="../client/irma.js" async defer></script>
         <script type="text/javascript" src="custom-button.js"></script>
     </head>
     <body>
-        Hello
         Typical flow:
         <ol>
             <li>User picks an action, i.e. login or decides to play a movie</li>
@@ -21,5 +21,10 @@
 
         Try it out now:
         <button id="try_irma_btn">Try IRMA</button>
+
+        <h3>Result</h3>
+        <h2 id="result_status"></h2>
+        <pre id="token-raw"></pre>
+        <pre id="token-content"></pre>
     </body>
 </html>

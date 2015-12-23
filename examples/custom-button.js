@@ -23,10 +23,14 @@ $(function() {
         var success_fun = function(data) {
             console.log("Authentication successful!");
             console.log("Authentication token:", data);
+            $("#result_status").html("Success!");
+            $("#token-raw").text(JSON.stringify(data));
+            $("#token-content").text(JSON.stringify(jwt_decode(data), null, 2));
         }
         var error_fun = function(data) {
             console.log("Authentication failed!");
             console.log("Error data:", data);
+            $("#result_status").html("Failure!");
         }
 
         btn.addEventListener("click", function() {

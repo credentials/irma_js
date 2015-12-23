@@ -22,6 +22,7 @@
   ],
   "dependencies": {
     "jquery": "~2.1.4",
-    "jquery-qrcode": "jquery.qrcode#~0.12.0"
+    "jquery-qrcode": "jquery.qrcode#~0.12.0",
+    "jwt-decode": "~1.4.0"
   }
 }
