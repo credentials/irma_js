@@ -1,36 +1,41 @@
-IRMA javascript client
+IRMA JavaScript client
 ======================
 
-Just some temporary notes. While developping, just run
+*For now this project is under heavy development, and should not yet be deployed.*
 
-    grunt
+This project contains all the web sources to interact with a verification API. It contains three parts:
 
-it'll automatically watch the source files and dump the compiled outputs into `build/`.
+ * `client`: The IRMA JavaScript library that you can use on your website if you want to integrate IRMA verification.
+ * `examples`: Example pages that use various aspects of the IRMA JavaScript library
+ * `server`: The verification pages shown by the verification server.
 
-Alternatively, you can call
+If you want to use IRMA on your own pages we recommend you use an existing verification server and rely on the examples in the `examples` directory to guide you. *FIXME: More extensive examples!*
 
-    grunt build
+## Development
 
-to make a single build.
+Some notes on development
 
-## Development tools
+## Quick start
 
-You may also need to install some development tools. Run
+First setup the development environment:
 
     npm install -g grunt-cli
     npm install -g bower
 
-to install Grunt. Run
+by installing grunt and bower. Then run
 
     npm install
-
-to download the desired node packages (I think ;)). Also, when we are using
-external js libraries (we're not using jQuery for now on the client side at
-least), run
-
     bower install
 
-first to download these packages.
+to install the node dependencies and JavaScript libraries. Finally run
+
+    grunt build
+
+to build the libraries and examples. See below for how to setup server URLs for a remote verification server or a local verification server. Alternatively, you can just run
+
+    grunt
+
+to keep rebuilding the files as they change. (Make sure that you run `grunt build` at least once to make sure everything gets build, or just run `grunt build watch` to build and keep building.)
 
 ## URLs for verification pages and verification apis
 
