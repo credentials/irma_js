@@ -31,3 +31,24 @@ least), run
     bower install
 
 first to download these packages.
+
+## URLs for verification pages and verification apis
+
+This project relies on two URLs for verifications:
+
+ * The examples depend on the url of the verification server, they use it to communicate with the verification server. To set the verification server's url using grunt, specify it using the `--verification_server_url=<URL>` option.
+ * The verification server pages need to know the location of the verification API backend to perform the actual verifications. To set the api's url using grunt, specify it using the `--verification_api_url=<URL>` option.
+
+Note that you only need the latter if you are working on the server pages. If this is the case, you might also be interested the shortcut when you run a local verification server as explained next.
+
+## Running a local verification server
+
+If you are running a local verification server using the `irma_verification_server` project you might as well use it to host the web pages as well (and thus avoid CORS problems). First, make sure that the assembled output is written to the `webapp` directory. If `irma_verification_server` is in the same directory is `irma_js` run:
+
+    ln -s ../irma_verification_server/src/main/webapp/ build
+
+Then simply specify the root of the servlet when running grunt:
+
+     grunt --server_url="http://<HOST>:8080/irma_verification_server/"
+
+If you want to test your application using an external token, make sure that `<HOST>` is either is an ip address that the token can reach, or is resolvable to one by the token.

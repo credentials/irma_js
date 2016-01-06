@@ -1,7 +1,20 @@
 module.exports = function (grunt) {
-    var server = grunt.option("server") || "http://localhost:9090";
-    var apiServer = grunt.option("apiServer") || "http://localhost:8080";
-    console.log("Server set to: ", server);
+    // Setup default urls for authentication server, and authentication_api urls
+    // these are used to configure the authentication server pages (so it can find
+    // the API) and the examples (so they can find the authentication server)
+    var authentication_server_url, authentication_api_url, server_url;
+    if( (typeof(grunt.option("server_url")) === "undefined" &&
+        (typeof(grunt.option("authentication_server_url")) === "undefined" ||
+         typeof(grunt.option("authentication_api_url")) === "undefined") )) {
+        console.log("INFO: either set server_url, or authentication_server_url and" +
+                    " authentication_api_url to have working local phone examples");
+    }
+    server_url = grunt.option("server_url") || "http://localhost:8080/irma_verification_server/";
+    authentication_server_url = grunt.option("authentication_server_url") || server_url + "server/";
+    authentication_api_url = grunt.option("authentication_api_url") || server_url +  "api/v1/";
+
+    console.log("Authentication server url:", authentication_server_url);
+    console.log("Authentication API url:", authentication_api_url);
 
     grunt.initConfig({
         browserify: {
@@ -55,21 +68,40 @@ module.exports = function (grunt) {
             },
             examples: {
                 cwd: "examples",
-                src: ["**/*"],
+                src: ["**/*", "!**/*.{html}"],
                 dest: "build/examples",
                 expand: "true"
             },
             client: {
                 cwd: "client",
-                src: ["**/*", "!**/*.{js,scss}"],
+                src: ["**/*", "!**/*.{js,scss,html}"],
                 dest: "build/client",
                 expand: "true"
             },
             server: {
                 cwd: "server",
-                src: ["**/*", "!**/*.{js,scss}"],
+                src: ["**/*", "!**/*.{js,scss,html}"],
                 dest: "build/server",
                 expand: "true"
+            }
+        },
+        'string-replace': {
+            examples: {
+                files: [{
+                    cwd: "./",
+                    src: ["{client,server,examples}/**/*.html"],
+                    dest: "build/",
+                    expand: "true"
+                }],
+                options: {
+                    replacements: [{
+                        pattern: '<IRMA_VERIFICATION_SERVER>',
+                        replacement: authentication_server_url
+                    }, {
+                        pattern: '<IRMA_VERIFICATION_API>',
+                        replacement: authentication_api_url
+                    }]
+                }
             }
         },
         watch: {
@@ -84,10 +116,16 @@ module.exports = function (grunt) {
             webfiles: {
                 files: [
                     "./{client,server}/**/*",
-                    "!./{client,server}/**/*.{js|scss}",
-                    "./examples/**/*"
+                    "./examples/**/*",
+                    "!./{client,server,examples}/**/*.{js,scss,html}",
                 ],
                 tasks: ["copy"]
+            },
+            htmlfiles: {
+                files: [
+                    "./{client,server,examples}/**/*.html"
+                ],
+                tasks: ["string-replace"]
             }
         }
     });
@@ -100,5 +138,5 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks("grunt-string-replace");
 
     grunt.registerTask("default", ["watch"]);
-    grunt.registerTask("build", ["browserify", "sass", "copy"]);
+    grunt.registerTask("build", ["browserify", "sass", "copy", "string-replace"]);
 };

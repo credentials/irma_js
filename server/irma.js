@@ -16,7 +16,7 @@ function getSetupFromMetas() {
     for(var i = 0; i < metas.length; i++) {
         var meta_name = metas[i].getAttribute("name").toLowerCase();
         console.log("Examining meta: ", meta_name);
-        if(meta_name === "verification-api-server") {
+        if(meta_name === "irma-verification-api") {
             server = metas[i].getAttribute("value");
             console.log("API server set to", server);
         }
