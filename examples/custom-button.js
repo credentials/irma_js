@@ -37,6 +37,12 @@ $(function() {
             console.log("Button clicked");
             IRMA.authenticate(sprequest, success_fun, error_fun);
         });
+
+        var btn2 = document.getElementById("try_irma_btn2")
+        btn2.addEventListener("click", function() {
+            console.log("Button clicked");
+            IRMA.authenticate_android(sprequest, success_fun, error_fun);
+        });
     }
 
     init();
