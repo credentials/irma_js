@@ -21,6 +21,7 @@ First setup the development environment:
 
     npm install -g grunt-cli
     npm install -g bower
+    npm install compass     # unchecked
 
 by installing grunt and bower. Then run
 
