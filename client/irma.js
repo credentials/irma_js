@@ -11,6 +11,12 @@ const State = {
     Done: Symbol()
 }
 
+var ua;
+const UserAgent = {
+    Desktop: Symbol(),
+    Android: Symbol(),
+}
+
 var sessionPackage;
 var verificationRequest;
 var successCallback;
@@ -45,6 +51,17 @@ function getSetupFromMetas() {
             server = metas[i].getAttribute("value");
             console.log("API server set to", server);
         }
+    }
+}
+
+/* TODO: Incomplete user agent detection */
+function detectUserAgent() {
+    if( /Android/i.test(navigator.userAgent) ) {
+        console.log("Detected Android");
+        ua = UserAgent.Android;
+    } else {
+        console.log("Detected Desktop");
+        ua = UserAgent.Desktop;
     }
 }
 
@@ -142,6 +159,15 @@ function authenticate_android(verReq, success_cb, failure_cb) {
     successCallback = success_cb;
     failureCallback = failure_cb;
 
+    if (ua === UserAgent.Desktop) {
+        // Popup code
+        console.log("Showing popup");
+        popup = window.open(verificationServer + serverPage, 'name','height=400,width=640');
+        if (window.focus) {
+            popup.focus();
+        }
+    }
+
     var xhr = new XMLHttpRequest();
     xhr.open('POST', encodeURI(server));
     xhr.setRequestHeader('Content-Type', 'application/json');
@@ -192,19 +218,13 @@ function setupClientMonitoring(data) {
 function connectClientToken() {
     // This is only for android, the popup for desktop has already been opened
     // so as to not trigger the popup blockers
+    // TODO for now only for android client
     if (ua === UserAgent.Android) {
         // Android code
         // TODO: handle URL more nicely
         var newUrl =  "http://app.irmacard.org/verify#" +
                 encodeURIComponent(JSON.stringify(sessionPackage));
-        alert("Setting new location to: " + newUrl);
-    } else {
-        // Popup code
-        console.log("Showing popup");
-        popup = window.open(verificationServer + serverPage, 'name','height=400,width=640');
-        if (window.focus) {
-            popup.focus();
-        }
+        window.location.href = newUrl;
     }
 }
 
@@ -254,7 +274,9 @@ function handleStatusMessageClientConnected(msg) {
 function finishVerification() {
     console.log("Verification completed, retrieving token");
 
-    sendMessageToPopup({type: "done"});
+    if (ua !== UserAgent.Android) {
+        sendMessageToPopup({type: "done"});
+    }
 
     var xhr = new XMLHttpRequest();
     xhr.open('GET', encodeURI( server + sessionId + "/getproof"));
@@ -274,9 +296,9 @@ function handleProofMessageFromServer(xhr) {
     }
 }
 
-
 // Initialize
 getSetupFromMetas();
+detectUserAgent();
 window.addEventListener('message', handleMessage, false);
 
 export {authenticate, authenticate_android, info};
