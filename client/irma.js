@@ -119,8 +119,10 @@ function handleMessageDone() {
 }
 
 function sendMessageToPopup(data) {
-    popup.postMessage(data, "*");
-    console.log("Sent message to popup: " + JSON.stringify(data));
+    if(typeof(popup) !== "undefined") {
+        popup.postMessage(data, "*");
+        console.log("Sent message to popup: " + JSON.stringify(data));
+    }
 }
 
 function authenticate(verReq, success, failure) {
