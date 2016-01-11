@@ -78,24 +78,8 @@ function handleMessage(event) {
             type: "tokenData",
             message: sessionPackage
         });
-    }
-
-    // TODO what are we doing with all this?
-    return;
-
-    switch(state) {
-        case State.Initialized:
-            handleMessageInitialized(msg);
-            break;
-        case State.PopupReady:
-            handleMessagePopupReady(msg);
-            break;
-        case State.Done:
-            console.log("Didn't expect a server message in state done");
-            break;
-        default:
-            console.log("Unknown state");
-            break;
+    } else {
+        console.log("Didn't expect the following message from the popup", msg);
     }
 }
 
