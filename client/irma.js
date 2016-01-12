@@ -194,7 +194,8 @@ function connectClientToken() {
     // so as to not trigger the popup blockers
     if (ua === UserAgent.Android) {
         // Android code
-        var newUrl =  "http://tesla.telox.net/~wouter/IRMA/#" +
+        // TODO: handle URL more nicely
+        var newUrl =  "http://app.irmacard.org/verify#" +
                 encodeURIComponent(JSON.stringify(sessionPackage));
         alert("Setting new location to: " + newUrl);
     } else {
