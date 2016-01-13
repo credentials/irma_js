@@ -108,7 +108,7 @@ function handleMessagePopupReady(msg) {
             }
             state = State.Done;
             break;
-        default: 
+        default:
             alert("Unknown message type: " + msg.type);
             break;
     }
@@ -208,8 +208,9 @@ function connectClientToken() {
     if (ua === UserAgent.Android) {
         // Android code
         // TODO: handle URL more nicely
-        var newUrl =  "http://app.irmacard.org/verify#" +
-                encodeURIComponent(JSON.stringify(sessionPackage));
+        var newUrl =  "intent://#Intent;package=org.irmacard.cardemu;scheme=cardemu;"
+            + "S.qr=" + encodeURIComponent(JSON.stringify(sessionPackage)) + ";"
+            + "S.browser_fallback_url=http%3A%2F%2Fapp.irmacard.org%2Fverify;end"
         window.location.href = newUrl;
     }
 }
