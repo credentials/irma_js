@@ -11,7 +11,7 @@ module.exports = function (grunt) {
     }
     server_url = grunt.option("server_url") || "http://localhost:8080/irma_verification_server/";
     authentication_server_url = grunt.option("authentication_server_url") || server_url + "server/";
-    authentication_api_url = grunt.option("authentication_api_url") || server_url +  "api/v2/";
+    authentication_api_url = grunt.option("authentication_api_url") || server_url +  "api/v2/verification/";
 
     console.log("Authentication server url:", authentication_server_url);
     console.log("Authentication API url:", authentication_api_url);
