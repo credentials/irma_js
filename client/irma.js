@@ -26,12 +26,19 @@ var sessionData;
 var sessionId;
 var server;
 
+const STATUS_CHECK_INTERVAL = 500;
+var fallbackTimer;
+
 function info() {
     console.log("VerificationServer:", verificationServer);
 }
 
 function failure(msg, ...data) {
     console.log("ERROR:", msg, ...data);
+
+    state = State.DONE;
+    cancelTimers();
+
     if(typeof(failureCallback) !== "undefined") {
         failureCallback(msg, ...data);
     }
@@ -186,6 +193,7 @@ function handleInitialServerMessage(xhr) {
         state = State.VerificationSessionStarted;
         console.log("Set state to VerificationSessionStarted");
         setupClientMonitoring();
+        setupFallbackMonitoring();
         connectClientToken();
     } else if (xhr.status !== 200) {
         var msg = "Initial call to server API failed. Returned status of " + xhr.status;
@@ -193,12 +201,66 @@ function handleInitialServerMessage(xhr) {
     }
 }
 
-function setupClientMonitoring(data) {
+var statusWebsocket;
+function setupClientMonitoring() {
     var url = server.replace(/^http/, "ws") + "status/" + sessionId;
     console.log("Connecting to websocket at:", url);
-    var ws = new WebSocket(url);
-    console.log("Got websocket: ", ws);
-    ws.onmessage = receiveStatusMessage;
+    statusWebsocket = new WebSocket(url);
+    console.log("Got websocket: ", statusWebsocket);
+    statusWebsocket.onmessage = receiveStatusMessage;
+}
+
+/*
+ * Periodically check if verification has completed when the
+ * websocket is not active.
+ */
+function setupFallbackMonitoring() {
+    var checkVerificationStatus = function () {
+        if ( state == State.Done ) {
+            clearTimeout(fallbackTimer);
+            return;
+        }
+
+        if ( typeof(statusWebsocket) === "undefined" ||
+             statusWebsocket.readyState !== 1 ) {
+            // Status WebSocket is not active, check using polling
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', encodeURI( server + sessionId + "/status"));
+            xhr.onload = function () { handleFallbackStatusUpdate (xhr); };
+            xhr.send();
+        }
+    }
+
+    fallbackTimer = setInterval(checkVerificationStatus, STATUS_CHECK_INTERVAL);
+}
+
+/*
+ * Handle polled status updates. There is no state , so status
+ * messages will be repeatedly processed by this function.
+ */
+function handleFallbackStatusUpdate(xhr) {
+    if(xhr.status === 200) {
+        // Success
+        var data = xhr.responseText;
+        switch(data) {
+            case "\"CONNECTED\"":
+                handleStatusMessageVerificationSessionStarted("CONNECTED");
+                break;
+            case "\"DONE\"":
+                handleStatusMessageClientConnected("DONE");
+                break;
+            default:
+                break;
+        }
+    } else {
+        failure("Status poll from server failed. Returned status of " + xhr.status, xhr);
+    }
+}
+
+function cancelTimers () {
+    if (typeof(fallbackTimer) !== "undefined") {
+        clearTimeout(fallbackTimer);
+    }
 }
 
 function connectClientToken() {
@@ -234,10 +296,12 @@ function receiveStatusMessage(data) {
 function handleStatusMessageVerificationSessionStarted(msg) {
     switch(msg) {
         case "CONNECTED":
-            console.log("Client device has connected with the server");
-            state = State.ClientConnected;
-            console.log("Set state to ClientConnected");
-            sendMessageToPopup({type: "clientConnected"});
+            if (state === State.VerificationSessionStarted) {
+                console.log("Client device has connected with the server");
+                state = State.ClientConnected;
+                console.log("Set state to ClientConnected");
+                sendMessageToPopup({type: "clientConnected"});
+            }
             break;
         default:
             failure("unknown status message in Initialized state", msg);
@@ -253,7 +317,7 @@ function handleStatusMessageClientConnected(msg) {
             finishVerification();
             break;
         default:
-            failure("unknown status message in Connected state");
+            failure("unknown status message in Connected state", msg);
             break;
     }
 }
@@ -276,6 +340,9 @@ function handleProofMessageFromServer(xhr) {
         // Success
         var data = xhr.responseText;
         console.log("Proof data: ", data);
+
+        cancelTimers();
+
         successCallback(data);
     } else {
         // Failure
