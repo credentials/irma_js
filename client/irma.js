@@ -271,6 +271,7 @@ function connectClientToken() {
         // Android code
         // TODO: handle URL more nicely
         var newUrl =  "intent://#Intent;package=org.irmacard.cardemu;scheme=cardemu;"
+            + "l.timestamp=" + Date.now() + ";"
             + "S.qr=" + encodeURIComponent(JSON.stringify(sessionPackage)) + ";"
             + "S.browser_fallback_url=http%3A%2F%2Fapp.irmacard.org%2Fverify;end"
         window.location.href = newUrl;
