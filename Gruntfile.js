@@ -117,7 +117,8 @@ module.exports = function (grunt) {
                 files: [
                     "./{client,server}/**/*",
                     "./examples/**/*",
-                    "!./{client,server,examples}/**/*.{js,scss,html}",
+                    "!./{client,server,examples}/**/*.{scss,html}",
+                    "!./{client,server}/**/*.js",
                 ],
                 tasks: ["copy"]
             },
