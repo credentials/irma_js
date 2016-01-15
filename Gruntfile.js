@@ -9,7 +9,7 @@ module.exports = function (grunt) {
         console.log("INFO: either set server_url, or authentication_server_url and" +
                     " authentication_api_url to have working local phone examples");
     }
-    server_url = grunt.option("server_url") || "http://localhost:8080/irma_verification_server/";
+    server_url = grunt.option("server_url") || "http://localhost:8080/irma_api_server/";
     authentication_server_url = grunt.option("authentication_server_url") || server_url + "server/";
     authentication_api_url = grunt.option("authentication_api_url") || server_url +  "api/v2/verification/";
 
