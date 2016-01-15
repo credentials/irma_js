@@ -68,7 +68,7 @@ module.exports = function (grunt) {
             },
             examples: {
                 cwd: "examples",
-                src: ["**/*", "!**/*.{html}"],
+                src: ["**/*", "!**/*.html"],
                 dest: "build/examples",
                 expand: "true"
             },
