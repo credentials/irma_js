@@ -8,6 +8,7 @@ const State = {
     VerificationSessionStarted: Symbol(),
     ClientConnected: Symbol(),
     PopupReady: Symbol(),
+    Cancelled: Symbol(),
     Done: Symbol()
 }
 
@@ -20,6 +21,7 @@ const UserAgent = {
 var sessionPackage;
 var verificationRequest;
 var successCallback;
+var cancelCallback;
 var failureCallback;
 
 var sessionData;
@@ -144,12 +146,13 @@ function authenticate(verReq, success, failure) {
     failureCallback = failure;
 };
 
-function authenticate_android(verReq, success_cb, failure_cb) {
+function authenticate_android(verReq, success_cb, cancel_cb, failure_cb) {
     state = State.Initialized;
     console.log("IRMA starting authentication for android");
 
     verificationRequest = verReq;
     successCallback = success_cb;
+    cancelCallback = cancel_cb;
     failureCallback = failure_cb;
 
     if (ua === UserAgent.Desktop) {
@@ -216,7 +219,7 @@ function setupClientMonitoring() {
  */
 function setupFallbackMonitoring() {
     var checkVerificationStatus = function () {
-        if ( state == State.Done ) {
+        if ( state == State.Done || state == State.Cancelled ) {
             clearTimeout(fallbackTimer);
             return;
         }
@@ -281,6 +284,12 @@ function connectClientToken() {
 function receiveStatusMessage(data) {
     console.log("STATUS: ", data);
     var msg = data.data
+
+    if (msg === "CANCELLED") {
+        cancelSession();
+        return;
+    }
+
     switch(state) {
         case State.VerificationSessionStarted:
             handleStatusMessageVerificationSessionStarted(msg);
@@ -326,14 +335,27 @@ function handleStatusMessageClientConnected(msg) {
 function finishVerification() {
     console.log("Verification completed, retrieving token");
 
-    if (ua !== UserAgent.Android) {
-        sendMessageToPopup({type: "done"});
-    }
+    closePopup();
 
     var xhr = new XMLHttpRequest();
     xhr.open('GET', encodeURI( server + sessionId + "/getproof"));
     xhr.onload = function () { handleProofMessageFromServer(xhr); };
     xhr.send();
+}
+
+function closePopup() {
+    if (ua !== UserAgent.Android) {
+        sendMessageToPopup({type: "done"});
+    }
+}
+
+function cancelSession() {
+    console.log("Token cancelled authentication");
+    state = State.Cancelled;
+
+    closePopup();
+    cancelTimers();
+    cancelCallback("User cancelled authentication");
 }
 
 function handleProofMessageFromServer(xhr) {

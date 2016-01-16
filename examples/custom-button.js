@@ -27,6 +27,10 @@ $(function() {
             $("#token-raw").text(JSON.stringify(data));
             $("#token-content").text(JSON.stringify(jwt_decode(data), null, 2));
         }
+        var cancel_fun = function(data) {
+            console.log("Authentication cancelled!");
+            $("#result_status").html("Cancelled!");
+        }
         var error_fun = function(data) {
             console.log("Authentication failed!");
             console.log("Error data:", data);
@@ -41,7 +45,7 @@ $(function() {
         var btn2 = document.getElementById("try_irma_btn2")
         btn2.addEventListener("click", function() {
             console.log("Button clicked");
-            IRMA.authenticate_android(sprequest, success_fun, error_fun);
+            IRMA.authenticate_android(sprequest, success_fun, cancel_fun, error_fun);
         });
     }
 
