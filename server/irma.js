@@ -42,6 +42,17 @@ function showMessage(msg) {
     $("#irma_text").html(msg);
 }
 
+$("#help_button").on("click", function() {
+    alert("Sorry, no help available yet");
+});
+
+$("#cancel_button").on("click", function() {
+    sendMessage({
+        type: "userCancelled"
+    });
+    window.close();
+});
+
 window.addEventListener('message', handleMessage, false);
 sendMessage({
     type: "serverPageReady"

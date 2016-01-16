@@ -80,15 +80,26 @@ function handleMessage(event) {
 
     // If server page is ready, the server page
     // was reloaded, reset state machine to Initialized
-    if(msg.type === "serverPageReady") {
-        //state = State.Initialized;
+    switch(msg.type) {
+        case "serverPageReady":
+            sendMessageToPopup({
+                type: "tokenData",
+                message: sessionPackage
+            });
+            break;
+        case "userCancelled":
+            cancelSession();
 
-        sendMessageToPopup({
-            type: "tokenData",
-            message: sessionPackage
-        });
-    } else {
-        console.log("Didn't expect the following message from the popup", msg);
+            // Inform the server too
+            var xhr = new XMLHttpRequest();
+            xhr.open('DELETE', encodeURI( server + sessionId ));
+            xhr.onload = function () {};
+            xhr.send();
+
+            break;
+        default:
+            console.log("Didn't expect the following message from the popup", msg);
+            break;
     }
 }
 
