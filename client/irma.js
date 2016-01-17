@@ -145,19 +145,7 @@ function sendMessageToPopup(data) {
     }
 }
 
-function authenticate(verReq, success, failure) {
-    state = State.Initialized;
-    console.log("IRMA starting authentication");
-    popup = window.open(verificationServer + serverPage, 'name','height=400,width=640');
-    if (window.focus) {
-        popup.focus();
-    }
-    verificationRequest = verReq;
-    successCallback = success;
-    failureCallback = failure;
-};
-
-function authenticate_android(verReq, success_cb, cancel_cb, failure_cb) {
+function verify(verReq, success_cb, cancel_cb, failure_cb) {
     state = State.Initialized;
     console.log("IRMA starting authentication for android");
 
@@ -389,4 +377,4 @@ getSetupFromMetas();
 detectUserAgent();
 window.addEventListener('message', handleMessage, false);
 
-export {authenticate, authenticate_android, info};
+export {verify, info};
