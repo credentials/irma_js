@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>IRMA Client demo page</title>
+        <meta name="irma-verification-server" value="<IRMA_VERIFICATION_SERVER>">
+        <meta name="irma-verification-api" value="<IRMA_VERIFICATION_API>">
+
+        <script type="text/javascript" src="../bower_components/jquery/dist/jquery.js"></script>
+        <script type="text/javascript" src="../bower_components/jwt-decode/build/jwt-decode.js"></script>
+
+        <link rel="stylesheet" href="custom-button.css">
+        <script type="text/javascript" src="../client/irma.js" async defer></script>
+        <script type="text/javascript" src="demo.js"></script>
+
+        <link href="../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    </head>
+    <body>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3">
+                    <h2>IRMA authentication demo</h2>
+                    <div id="alert_box">
+                    </div>
+                    Please select the attributes that you want to
+                    provide to the server to authenticate yourself.
+                    <form>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" id="over16" value="MijnOverheid.ageLower.over16"> MijnOverheid.ageLower.over16
+                            </label>
+                        </div>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" id="over18" value="MijnOverheid.ageLower.over18"> MijnOverheid.ageLower.over18
+                            </label>
+                        </div>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" id="firstname" value="MijnOverheid.fullName.firstname"> MijnOverheid.name.firstname
+                            </label>
+                        </div>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" id="familyname" value="MijnOverheid.fullName.familyname"> MijnOverheid.name.familyname
+                            </label>
+                        </div>
+                    </form>
+
+                    <button id="irma_btn" class="btn btn-primary">Authenticate with IRMA</button>
+
+                    <h3 hidden id="attribute_heading">Verified attributes</h3>
+                    <table id="attribute_list" class="table" hidden>
+                        <thead>
+                            <th>Attribute</th>
+                            <th>Value</th>
+                        </thead>
+                        <tbody id="attribute_list_data">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
