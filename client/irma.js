@@ -150,9 +150,29 @@ function verify(verReq, success_cb, cancel_cb, failure_cb) {
     console.log("IRMA starting authentication for android");
 
     verificationRequest = verReq;
+
     successCallback = success_cb;
     cancelCallback = cancel_cb;
     failureCallback = failure_cb;
+
+    // Ensure that all the callbacks are properly bound
+    if (typeof(successCallback) !== "function") {
+        console.log("WARNING: successCallback is not defined.",
+                    "irma.js will not return any results!");
+        successCallback = function () {};
+    }
+
+    if (typeof(cancelCallback) !== "function") {
+        console.log("WARNING: cancelCallback is not defined.",
+                    "irma.js will not notify cancel events!");
+        cancelCallback = function () {};
+    }
+
+    if (typeof(failureCallback) !== "function") {
+        console.log("WARNING: failureCallback is not defined.",
+                    "irma.js will not notify error events!");
+        cancelCallback = function () {};
+    }
 
     if (ua === UserAgent.Desktop) {
         // Popup code
