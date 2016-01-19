@@ -50,7 +50,12 @@ function getSetupFromMetas() {
     console.log("Running getSetupFromMetas");
     var metas = document.getElementsByTagName("meta");
     for(var i = 0; i < metas.length; i++) {
-        var meta_name = metas[i].getAttribute("name").toLowerCase();
+        var meta_name = metas[i].getAttribute("name");
+        if (meta_name == null) {
+            continue;
+        }
+
+        meta_name = meta_name.toLowerCase();
         console.log("Examining meta: ", meta_name);
         if(meta_name === "irma-verification-server") {
             verificationServer = metas[i].getAttribute("value");
