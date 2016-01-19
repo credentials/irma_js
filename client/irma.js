@@ -147,10 +147,8 @@ function sendMessageToPopup(data) {
 
 function verify(verReq, success_cb, cancel_cb, failure_cb) {
     state = State.Initialized;
-    console.log("IRMA starting authentication for android");
 
     verificationRequest = verReq;
-
     successCallback = success_cb;
     cancelCallback = cancel_cb;
     failureCallback = failure_cb;
@@ -176,7 +174,6 @@ function verify(verReq, success_cb, cancel_cb, failure_cb) {
 
     if (ua === UserAgent.Desktop) {
         // Popup code
-        console.log("Showing popup");
         popup = window.open(verificationServer + serverPage, 'name','height=400,width=640');
         if (window.focus) {
             popup.focus();
@@ -213,7 +210,6 @@ function handleInitialServerMessage(xhr) {
         };
 
         state = State.VerificationSessionStarted;
-        console.log("Set state to VerificationSessionStarted");
         setupClientMonitoring();
         setupFallbackMonitoring();
         connectClientToken();
@@ -226,9 +222,7 @@ function handleInitialServerMessage(xhr) {
 var statusWebsocket;
 function setupClientMonitoring() {
     var url = server.replace(/^http/, "ws") + "status/" + sessionId;
-    console.log("Connecting to websocket at:", url);
     statusWebsocket = new WebSocket(url);
-    console.log("Got websocket: ", statusWebsocket);
     statusWebsocket.onmessage = receiveStatusMessage;
 }
 
@@ -301,7 +295,6 @@ function connectClientToken() {
 }
 
 function receiveStatusMessage(data) {
-    console.log("STATUS: ", data);
     var msg = data.data
 
     if (msg === "CANCELLED") {
@@ -328,7 +321,6 @@ function handleStatusMessageVerificationSessionStarted(msg) {
             if (state === State.VerificationSessionStarted) {
                 console.log("Client device has connected with the server");
                 state = State.ClientConnected;
-                console.log("Set state to ClientConnected");
                 sendMessageToPopup({type: "clientConnected"});
             }
             break;
@@ -352,8 +344,6 @@ function handleStatusMessageClientConnected(msg) {
 }
 
 function finishVerification() {
-    console.log("Verification completed, retrieving token");
-
     closePopup();
 
     var xhr = new XMLHttpRequest();
