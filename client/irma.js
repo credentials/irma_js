@@ -12,6 +12,11 @@ const State = {
     Done: Symbol()
 }
 
+const Action = {
+    Verifying: Symbol(),
+    Issuing: Symbol()
+}
+
 var ua;
 const UserAgent = {
     Desktop: Symbol(),
@@ -20,6 +25,7 @@ const UserAgent = {
 
 var sessionPackage;
 var verificationRequest;
+var issuingRequest;
 var successCallback;
 var cancelCallback;
 var failureCallback;
@@ -27,7 +33,9 @@ var failureCallback;
 var sessionData;
 var sessionId;
 var server;
+var action;
 var verificationPath;
+var issuancePath;
 
 const STATUS_CHECK_INTERVAL = 500;
 var fallbackTimer;
@@ -65,6 +73,7 @@ function getSetupFromMetas() {
         if(meta_name === "irma-verification-api") {
             server = metas[i].getAttribute("value");
             verificationPath = server + "verification/";
+            issuancePath = server + "issue/";
             console.log("API server set to", server);
         }
     }
@@ -152,10 +161,26 @@ function sendMessageToPopup(data) {
     }
 }
 
+function issue(isReq, jwtKey, success_cb, cancel_cb, failure_cb) {
+    issuingRequest = isReq;
+    action = Action.Issuing;
+    var jwt = createJwt(jwtKey, isReq);
+
+    doInitialRequest(jwt, 'text/plain', issuancePath, success_cb, cancel_cb, failure_cb);
+}
+
+
 function verify(verReq, success_cb, cancel_cb, failure_cb) {
+    verificationRequest = verReq;
+    action = Action.Verifying;
+
+    doInitialRequest(JSON.stringify(verificationRequest), 'application/json',
+            verificationPath, success_cb, cancel_cb, failure_cb);
+}
+
+function doInitialRequest(request, contenttype, path, success_cb, cancel_cb, failure_cb) {
     state = State.Initialized;
 
-    verificationRequest = verReq;
     successCallback = success_cb;
     cancelCallback = cancel_cb;
     failureCallback = failure_cb;
@@ -188,13 +213,13 @@ function verify(verReq, success_cb, cancel_cb, failure_cb) {
     }
 
     var xhr = new XMLHttpRequest();
-    xhr.open('POST', encodeURI(verificationPath));
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.onload = function() { handleInitialServerMessage(xhr) };
-    xhr.send(JSON.stringify(verificationRequest));
+    xhr.open('POST', encodeURI(path));
+    xhr.setRequestHeader('Content-Type', contenttype);
+    xhr.onload = function() { handleInitialServerMessage(xhr, path) };
+    xhr.send(request);
 };
 
-function handleInitialServerMessage(xhr) {
+function handleInitialServerMessage(xhr, path) {
     if (xhr.status === 200) {
         try {
             sessionData = JSON.parse(xhr.responseText);
@@ -213,7 +238,7 @@ function handleInitialServerMessage(xhr) {
 
         sessionPackage = {
             v: sessionData.v,
-            u: verificationPath + sessionId
+            u: path + sessionId
         };
 
         state = State.VerificationSessionStarted;
@@ -342,12 +367,20 @@ function handleStatusMessageClientConnected(msg) {
         case "DONE":
             console.log("Proof is done");
             state = State.Done;
-            finishVerification();
+            if (action == Action.Verifying)
+                finishVerification();
+            else if (action == Action.Issuing)
+                finishIssuance();
             break;
         default:
             failure("unknown status message in Connected state", msg);
             break;
     }
+}
+
+function finishIssuance() {
+    closePopup();
+    successCallback();
 }
 
 function finishVerification() {
@@ -389,9 +422,25 @@ function handleProofMessageFromServer(xhr) {
     }
 }
 
+function createJwt(privatekey, isReq) {
+    if (privatekey != null) {
+        var prvKey = KEYUTIL.getKey(privatekey);
+        var alg = "RS256";
+    } else {
+        var prvKey = null;
+        var alg = "none";
+    }
+
+    var header = JSON.stringify({alg: alg, typ: "JWT"});
+    var payload = {sub: "issue_request", iss: "testip", iat: Math.floor(Date.now() / 1000)};
+    $.extend(payload, {"iprequest": isReq});
+
+    return KJUR.jws.JWS.sign(alg, header, payload, prvKey);
+}
+
 // Initialize
 getSetupFromMetas();
 detectUserAgent();
 window.addEventListener('message', handleMessage, false);
 
-export {verify, info};
+export {verify, issue, info};

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>IRMA issuing test</title>
+        <meta name="irma-verification-server" value="<IRMA_VERIFICATION_SERVER>">
+        <meta name="irma-verification-api" value="<IRMA_VERIFICATION_API>">
+
+        <script type="text/javascript" src="../bower_components/jquery/dist/jquery.js"></script>
+        <script type="text/javascript" src="../bower_components/jsrsasign/jsrsasign-latest-all-min.js"></script>
+
+        <script type="text/javascript" src="../client/irma.js" async defer></script>
+        <script type="text/javascript" src="issue.js"></script>
+
+        <link href="../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    </head>
+    <body>
+        <div class="container">
+            <h2>Issuing test</h2>
+            <div id="alert_box"></div>
+            <button id="irma_btn" class="btn btn-primary">Issue credentials</button>
+        </div>
+    </body>
+</html>
