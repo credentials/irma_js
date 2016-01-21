@@ -135,41 +135,6 @@ function handleMessage(event) {
     }
 }
 
-function handleMessageInitialized(msg) {
-    switch(msg.type) {
-        case "serverPageReady":
-            sendMessageToPopup({
-                type: "verificationRequest",
-                message: verificationRequest
-            });
-            state = State.PopupReady;
-            break;
-        default:
-            alert("Unknown message type: " + msg.type);
-            break;
-    }
-}
-
-function handleMessagePopupReady(msg) {
-    switch(msg.type) {
-        case "verificationResult":
-            if(msg.status === "success") {
-                successCallback(msg.message);
-            } else {
-                failureCallback(msg.message);
-            }
-            state = State.Done;
-            break;
-        default:
-            alert("Unknown message type: " + msg.type);
-            break;
-    }
-}
-
-function handleMessageDone() {
-    console.log("Didn't expect message type " + msg.data.type);
-}
-
 function sendMessageToPopup(data) {
     if(typeof(popup) !== "undefined") {
         popup.postMessage(data, "*");
