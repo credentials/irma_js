@@ -12,6 +12,15 @@ const State = {
     Done: Symbol()
 }
 
+const StateMap = {
+    [State.Initialized]: "Initialized",
+    [State.VerificationSessionStarted]: "VSS",
+    [State.ClientConnected]: "ClientConnected",
+    [State.PopupReady]: "PopupReady",
+    [State.Cancelled]: "Cancelled",
+    [State.Done]: "Done"
+}
+
 const Action = {
     Verifying: Symbol(),
     Issuing: Symbol()
@@ -93,6 +102,7 @@ function detectUserAgent() {
 function handleMessage(event) {
     var msg = event.data
     console.log("Received message: ", msg);
+    console.log("State", StateMap[state]);
 
     // If server page is ready, the server page
     // was reloaded, reset state machine to Initialized
