@@ -43,8 +43,7 @@ var sessionData;
 var sessionId;
 var server;
 var action;
-var verificationPath;
-var issuancePath;
+var actionPath;
 
 const STATUS_CHECK_INTERVAL = 500;
 var fallbackTimer;
@@ -82,8 +81,6 @@ function getSetupFromMetas() {
         }
         if(meta_name === "irma-verification-api") {
             server = metas[i].getAttribute("value");
-            verificationPath = server + "verification/";
-            issuancePath = server + "issue/";
             console.log("API server set to", server);
         }
     }
@@ -124,7 +121,7 @@ function handleMessage(event) {
 
             // Inform the server too
             var xhr = new XMLHttpRequest();
-            xhr.open('DELETE', encodeURI( verificationPath + sessionId ));
+            xhr.open('DELETE', encodeURI( actionPath + sessionId ));
             xhr.onload = function () {};
             xhr.send();
 
@@ -146,20 +143,22 @@ function issue(isReq, jwtKey, success_cb, cancel_cb, failure_cb) {
     issuingRequest = isReq;
     action = Action.Issuing;
     var jwt = createJwt(jwtKey, isReq);
+    actionPath = server + "issue/";
 
-    doInitialRequest(jwt, 'text/plain', issuancePath, success_cb, cancel_cb, failure_cb);
+    doInitialRequest(jwt, 'text/plain', success_cb, cancel_cb, failure_cb);
 }
 
 
 function verify(verReq, success_cb, cancel_cb, failure_cb) {
     verificationRequest = verReq;
     action = Action.Verifying;
+    actionPath = server + "verification/";
 
     doInitialRequest(JSON.stringify(verificationRequest), 'application/json',
-            verificationPath, success_cb, cancel_cb, failure_cb);
+            success_cb, cancel_cb, failure_cb);
 }
 
-function doInitialRequest(request, contenttype, path, success_cb, cancel_cb, failure_cb) {
+function doInitialRequest(request, contenttype, success_cb, cancel_cb, failure_cb) {
     state = State.Initialized;
 
     successCallback = success_cb;
@@ -193,14 +192,15 @@ function doInitialRequest(request, contenttype, path, success_cb, cancel_cb, fai
         }
     }
 
+
     var xhr = new XMLHttpRequest();
-    xhr.open('POST', encodeURI(path));
+    xhr.open('POST', encodeURI(actionPath));
     xhr.setRequestHeader('Content-Type', contenttype);
-    xhr.onload = function() { handleInitialServerMessage(xhr, path) };
+    xhr.onload = function() { handleInitialServerMessage(xhr) };
     xhr.send(request);
 };
 
-function handleInitialServerMessage(xhr, path) {
+function handleInitialServerMessage(xhr) {
     if (xhr.status === 200) {
         try {
             sessionData = JSON.parse(xhr.responseText);
@@ -217,10 +217,12 @@ function handleInitialServerMessage(xhr, path) {
             return;
         }
 
+        console.log("Setting sessionPackage");
         sessionPackage = {
             v: sessionData.v,
-            u: path + sessionId
+            u: actionPath + sessionId
         };
+        console.log("sessionPackage", sessionPackage);
 
         state = State.VerificationSessionStarted;
         setupClientMonitoring();
@@ -244,8 +246,7 @@ function setupClientMonitoring() {
  * websocket is not active.
  */
 function setupFallbackMonitoring() {
-    var status_url = (action == Action.Issuing ? issuancePath : verificationPath)
-                + sessionId + "/status";
+    var status_url = actionPath + sessionId + "/status";
 
     var checkVerificationStatus = function () {
         if ( state == State.Done || state == State.Cancelled ) {
@@ -371,7 +372,7 @@ function finishVerification() {
     closePopup();
 
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', encodeURI( verificationPath + sessionId + "/getproof"));
+    xhr.open('GET', encodeURI( actionPath + sessionId + "/getproof"));
     xhr.onload = function () { handleProofMessageFromServer(xhr); };
     xhr.send();
 }
