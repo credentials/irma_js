@@ -27,6 +27,7 @@ var failureCallback;
 var sessionData;
 var sessionId;
 var server;
+var verificationPath;
 
 const STATUS_CHECK_INTERVAL = 500;
 var fallbackTimer;
@@ -63,6 +64,7 @@ function getSetupFromMetas() {
         }
         if(meta_name === "irma-verification-api") {
             server = metas[i].getAttribute("value");
+            verificationPath = server + "verification/";
             console.log("API server set to", server);
         }
     }
@@ -97,7 +99,7 @@ function handleMessage(event) {
 
             // Inform the server too
             var xhr = new XMLHttpRequest();
-            xhr.open('DELETE', encodeURI( server + sessionId ));
+            xhr.open('DELETE', encodeURI( verificationPath + sessionId ));
             xhr.onload = function () {};
             xhr.send();
 
@@ -186,7 +188,7 @@ function verify(verReq, success_cb, cancel_cb, failure_cb) {
     }
 
     var xhr = new XMLHttpRequest();
-    xhr.open('POST', encodeURI(server));
+    xhr.open('POST', encodeURI(verificationPath));
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.onload = function() { handleInitialServerMessage(xhr) };
     xhr.send(JSON.stringify(verificationRequest));
@@ -211,7 +213,7 @@ function handleInitialServerMessage(xhr) {
 
         sessionPackage = {
             v: sessionData.v,
-            u: server + sessionId
+            u: verificationPath + sessionId
         };
 
         state = State.VerificationSessionStarted;
@@ -246,7 +248,7 @@ function setupFallbackMonitoring() {
              statusWebsocket.readyState !== 1 ) {
             // Status WebSocket is not active, check using polling
             var xhr = new XMLHttpRequest();
-            xhr.open('GET', encodeURI( server + sessionId + "/status"));
+            xhr.open('GET', encodeURI( verificationPath + sessionId + "/status"));
             xhr.onload = function () { handleFallbackStatusUpdate (xhr); };
             xhr.send();
         }
@@ -352,7 +354,7 @@ function finishVerification() {
     closePopup();
 
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', encodeURI( server + sessionId + "/getproof"));
+    xhr.open('GET', encodeURI( verificationPath + sessionId + "/getproof"));
     xhr.onload = function () { handleProofMessageFromServer(xhr); };
     xhr.send();
 }
