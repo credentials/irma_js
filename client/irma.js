@@ -56,7 +56,8 @@ function info() {
 function failure(msg, ...data) {
     console.log("ERROR:", msg, ...data);
 
-    state = State.DONE;
+    state = State.Done;
+    closePopup();
     cancelTimers();
 
     if(typeof(failureCallback) !== "undefined") {
@@ -108,6 +109,11 @@ function handleMessage(event) {
     // was reloaded, reset state machine to Initialized
     switch(msg.type) {
         case "serverPageReady":
+            if (state == State.Done || state == State.Cancelled) {
+                console.log("Closing popup");
+                closePopup();
+                return;
+            }
             sendMessageToPopup({
                 type: "tokenData",
                 message: sessionPackage
