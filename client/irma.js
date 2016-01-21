@@ -244,6 +244,9 @@ function setupClientMonitoring() {
  * websocket is not active.
  */
 function setupFallbackMonitoring() {
+    var status_url = (action == Action.Issuing ? issuancePath : verificationPath)
+                + sessionId + "/status";
+
     var checkVerificationStatus = function () {
         if ( state == State.Done || state == State.Cancelled ) {
             clearTimeout(fallbackTimer);
@@ -254,7 +257,7 @@ function setupFallbackMonitoring() {
              statusWebsocket.readyState !== 1 ) {
             // Status WebSocket is not active, check using polling
             var xhr = new XMLHttpRequest();
-            xhr.open('GET', encodeURI( verificationPath + sessionId + "/status"));
+            xhr.open('GET', encodeURI(status_url));
             xhr.onload = function () { handleFallbackStatusUpdate (xhr); };
             xhr.send();
         }
