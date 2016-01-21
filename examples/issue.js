@@ -44,6 +44,52 @@ $(function() {
     };
 
     $("#irma_btn").on("click", function() {
+        // Clear errors
+        $(".form-group").removeClass("has-error");
+        $("#alert_box").empty();
+
+        // Ready&Validate fields
+        var error = false;
+        var street = $("#inputStreet").prop("value");
+        if (street === "") {
+            error = true;
+            $("#groupStreet").addClass("has-error");
+        }
+
+        var zipcode = $("#inputZipCode").prop("value");
+        if (zipcode === "") {
+            error = true;
+            $("#groupZipCode").addClass("has-error");
+        }
+
+        var city = $("#inputCity").prop("value");
+        if (city === "") {
+            error = true;
+            $("#groupCity").addClass("has-error");
+        }
+
+        var country = $("#inputCountry").prop("value");
+        if (country === "") {
+            error = true;
+            $("#groupCountry").addClass("has-error");
+        }
+
+        var attributes = {
+            "country": country,
+            "city": city,
+            "street": street,
+            "zipcode": zipcode
+        };
+        console.log(attributes);
+
+        iprequest.request.credentials[0].attributes = attributes;
+        console.log(iprequest);
+
+        if (error) {
+            showWarning("Fields may not be empty");
+            return;
+        }
+
         IRMA.issue(iprequest, null, success_fun, showWarning, showError);
     });
 });
