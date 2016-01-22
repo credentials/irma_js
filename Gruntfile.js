@@ -1,20 +1,20 @@
 module.exports = function (grunt) {
-    // Setup default urls for authentication server, and authentication_api urls
-    // these are used to configure the authentication server pages (so it can find
+    // Setup default urls for the irma web server, and irma api server urls
+    // these are used to configure the server pages (so it can find
     // the API) and the examples (so they can find the authentication server)
     var authentication_server_url, authentication_api_url, server_url;
     if( (typeof(grunt.option("server_url")) === "undefined" &&
-        (typeof(grunt.option("authentication_server_url")) === "undefined" ||
-         typeof(grunt.option("authentication_api_url")) === "undefined") )) {
-        console.log("INFO: either set server_url, or authentication_server_url and" +
-                    " authentication_api_url to have working local phone examples");
+        (typeof(grunt.option("web_server_url")) === "undefined" ||
+         typeof(grunt.option("api_server_url")) === "undefined") )) {
+        console.log("INFO: either set server_url, or web_server_url and" +
+                    " api_server_url to have working local phone examples");
     }
     server_url = grunt.option("server_url") || "http://localhost:8080/irma_api_server/";
-    authentication_server_url = grunt.option("authentication_server_url") || server_url + "server/";
-    authentication_api_url = grunt.option("authentication_api_url") || server_url +  "api/v2/";
+    web_server_url = grunt.option("web_server_url") || server_url +  "server/";
+    api_server_url = grunt.option("api_server_url") || server_url + "api/v2/";
 
-    console.log("Authentication server url:", authentication_server_url);
-    console.log("Authentication API url:", authentication_api_url);
+    console.log("Web server url:", web_server_url);
+    console.log("Api server url:", api_server_url);
 
     grunt.initConfig({
         browserify: {
@@ -95,11 +95,11 @@ module.exports = function (grunt) {
                 }],
                 options: {
                     replacements: [{
-                        pattern: '<IRMA_VERIFICATION_SERVER>',
-                        replacement: authentication_server_url
+                        pattern: '<IRMA_WEB_SERVER>',
+                        replacement: web_server_url
                     }, {
-                        pattern: '<IRMA_VERIFICATION_API>',
-                        replacement: authentication_api_url
+                        pattern: '<IRMA_API_SERVER>',
+                        replacement: api_server_url
                     }]
                 }
             }

@@ -1,4 +1,4 @@
-var verificationServer = "";
+var webServer = "";
 const serverPage = "authenticate.html";
 var popup;
 
@@ -41,7 +41,7 @@ var failureCallback;
 
 var sessionData;
 var sessionId;
-var server;
+var apiServer;
 var action;
 var actionPath;
 
@@ -49,7 +49,7 @@ const STATUS_CHECK_INTERVAL = 500;
 var fallbackTimer;
 
 function info() {
-    console.log("VerificationServer:", verificationServer);
+    console.log("VerificationServer:", webServer);
 }
 
 function failure(msg, ...data) {
@@ -75,13 +75,13 @@ function getSetupFromMetas() {
 
         meta_name = meta_name.toLowerCase();
         console.log("Examining meta: ", meta_name);
-        if(meta_name === "irma-verification-server") {
-            verificationServer = metas[i].getAttribute("value");
-            console.log("VerificationServer set to", verificationServer);
+        if(meta_name === "irma-web-server") {
+            webServer = metas[i].getAttribute("value");
+            console.log("VerificationServer set to", webServer);
         }
-        if(meta_name === "irma-verification-api") {
-            server = metas[i].getAttribute("value");
-            console.log("API server set to", server);
+        if(meta_name === "irma-api-server") {
+            apiServer = metas[i].getAttribute("value");
+            console.log("API server set to", apiServer);
         }
     }
 }
@@ -143,7 +143,7 @@ function issue(isReq, jwtKey, success_cb, cancel_cb, failure_cb) {
     issuingRequest = isReq;
     action = Action.Issuing;
     var jwt = createJwt(jwtKey, isReq);
-    actionPath = server + "issue/";
+    actionPath = apiServer + "issue/";
 
     doInitialRequest(jwt, 'text/plain', success_cb, cancel_cb, failure_cb);
 }
@@ -152,7 +152,8 @@ function issue(isReq, jwtKey, success_cb, cancel_cb, failure_cb) {
 function verify(verReq, success_cb, cancel_cb, failure_cb) {
     verificationRequest = verReq;
     action = Action.Verifying;
-    actionPath = server + "verification/";
+    actionPath = apiServer + "verification/";
+    console.log("Action Path set to: ", actionPath);
 
     doInitialRequest(JSON.stringify(verificationRequest), 'application/json',
             success_cb, cancel_cb, failure_cb);
@@ -186,7 +187,7 @@ function doInitialRequest(request, contenttype, success_cb, cancel_cb, failure_c
 
     if (ua === UserAgent.Desktop) {
         // Popup code
-        popup = window.open(verificationServer + serverPage, 'name','height=400,width=640');
+        popup = window.open(webServer + serverPage, 'name','height=400,width=640');
         if (window.focus) {
             popup.focus();
         }
@@ -236,7 +237,7 @@ function handleInitialServerMessage(xhr) {
 
 var statusWebsocket;
 function setupClientMonitoring() {
-    var url = server.replace(/^http/, "ws") + "status/" + sessionId;
+    var url = apiServer.replace(/^http/, "ws") + "status/" + sessionId;
     statusWebsocket = new WebSocket(url);
     statusWebsocket.onmessage = receiveStatusMessage;
 }
