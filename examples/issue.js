@@ -84,12 +84,12 @@ $(function() {
 
         iprequest.request.credentials[0].attributes = attributes;
         console.log(iprequest);
-
         if (error) {
             showWarning("Fields may not be empty");
             return;
         }
 
-        IRMA.issue(iprequest, null, success_fun, showWarning, showError);
+        var jwt = IRMA.createUnsignedJWT(iprequest);
+        IRMA.issue(jwt, success_fun, showWarning, showError);
     });
 });

@@ -137,10 +137,8 @@ function sendMessageToPopup(data) {
     }
 }
 
-function issue(isReq, jwtKey, success_cb, cancel_cb, failure_cb) {
-    issuingRequest = isReq;
+function issue(jwt, success_cb, cancel_cb, failure_cb) {
     action = Action.Issuing;
-    var jwt = createJwt(jwtKey, isReq);
     actionPath = apiServer + "issue/";
 
     doInitialRequest(jwt, 'text/plain', success_cb, cancel_cb, failure_cb);
@@ -458,9 +456,41 @@ function createJwt(privatekey, isReq) {
     return KJUR.jws.JWS.sign(alg, header, payload, prvKey);
 }
 
+function base64url(src) {
+    var res = btoa(src);
+
+    // Remove padding characters
+    res = res.replace(/=+$/, '');
+
+    // Replace non-url characters
+    res = res.replace(/\+/g, '-');
+    res = res.replace(/\//g, '_');
+
+    return res;
+}
+
+function createUnsignedJWT(iprequest) {
+    console.log("Creating unsigned JWT!!!");
+    var header = {
+        alg: "none",
+        typ: "JWT"
+    };
+
+    var payload = {
+        sub: "issue_request",
+        iss: "testip",
+        iat: Math.floor(Date.now() / 1000),
+        "iprequest": iprequest
+    };
+
+    return base64url(JSON.stringify(header)) + "." +
+           base64url(JSON.stringify(payload)) + ".";
+}
+
+
 // Initialize
 getSetupFromMetas();
 detectUserAgent();
 window.addEventListener('message', handleMessage, false);
 
-export {verify, issue, info};
+export {verify, issue, info, createUnsignedJWT};
