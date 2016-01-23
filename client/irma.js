@@ -179,7 +179,7 @@ function doInitialRequest(request, contenttype, success_cb, cancel_cb, failure_c
     if (typeof(failureCallback) !== "function") {
         console.log("WARNING: failureCallback is not defined.",
                     "irma.js will not notify error events!");
-        cancelCallback = function () {};
+        failureCallback = function () {};
     }
 
     if (ua === UserAgent.Desktop) {
