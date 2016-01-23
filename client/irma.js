@@ -33,8 +33,6 @@ const UserAgent = {
 }
 
 var sessionPackage;
-var verificationRequest;
-var issuingRequest;
 var successCallback;
 var cancelCallback;
 var failureCallback;
@@ -149,8 +147,7 @@ function issue(isReq, jwtKey, success_cb, cancel_cb, failure_cb) {
 }
 
 
-function verify(verReq, success_cb, cancel_cb, failure_cb) {
-    verificationRequest = verReq;
+function verify(verificationRequest, success_cb, cancel_cb, failure_cb) {
     action = Action.Verifying;
     actionPath = apiServer + "verification/";
     console.log("Action Path set to: ", actionPath);
