@@ -277,8 +277,8 @@ function handleFallbackStatusUpdate(xhr) {
             case "\"SUCCESS\"":
                 handleStatusMessageClientConnected("SUCCESS");
                 break;
-            case "\"FAILURE\"":
-                handleStatusMessageClientConnected("FAILURE");
+            case "\"FAILED\"":
+                handleStatusMessageClientConnected("FAILED");
                 break;
             default:
                 break;
@@ -433,7 +433,7 @@ function handleFailedProofFromServer(xhr) {
         console.log("Failed proof data: ", data);
 
         cancelTimers();
-        failureCallback("Server reject the proof", data);
+        failureCallback("Server rejected the proof", data);
     } else {
         // Failure
         failure("Request for unsigned proof from server failed. Returned status of " + xhr.status, xhr);
