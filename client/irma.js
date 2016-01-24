@@ -274,16 +274,14 @@ function handleFallbackStatusUpdate(xhr) {
             case "\"CONNECTED\"":
                 handleStatusMessageVerificationSessionStarted("CONNECTED");
                 break;
-            case "\"SUCCESS\"":
-                handleStatusMessageClientConnected("SUCCESS");
+            case "\"DONE\"":
+                handleStatusMessageClientConnected("DONE");
                 break;
             case "\"CANCELLED\"":
                 cancelSession();
                 break;
-            case "\"FAILED\"":
-                handleStatusMessageClientConnected("FAILED");
-                break;
             default:
+                console.log("Got unexpected state in poll: ", data)
                 break;
         }
     } else {
@@ -350,21 +348,13 @@ function handleStatusMessageVerificationSessionStarted(msg) {
 
 function handleStatusMessageClientConnected(msg) {
     switch(msg) {
-        case "SUCCESS":
-            console.log("Everyting successful");
+        case "DONE":
+            console.log("Server returned DONE");
             state = State.Done;
             if (action == Action.Verifying)
                 finishVerification();
             else if (action == Action.Issuing)
                 finishIssuance();
-            break;
-        case "FAILED":
-            console.log("Proof failed");
-            state = State.Done;
-            if (action == Action.Verifying)
-                finishFailedVerification();
-            else if (action == Action.Issuing)
-                finishFailedIssuance();
             break;
         default:
             failure("unknown status message in Connected state", msg);
@@ -377,26 +367,12 @@ function finishIssuance() {
     successCallback();
 }
 
-function finishFailedIssuance() {
-    closePopup();
-    failureCallback("Issuance failed");
-}
-
 function finishVerification() {
     closePopup();
 
     var xhr = new XMLHttpRequest();
     xhr.open('GET', encodeURI( actionPath + sessionId + "/getproof"));
     xhr.onload = function () { handleProofMessageFromServer(xhr); };
-    xhr.send();
-}
-
-function finishFailedVerification() {
-    closePopup();
-
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', encodeURI( actionPath + sessionId + "/getunsignedproof"));
-    xhr.onload = function () { handleFailedProofFromServer(xhr); };
     xhr.send();
 }
 
@@ -422,24 +398,17 @@ function handleProofMessageFromServer(xhr) {
         console.log("Proof data: ", data);
 
         cancelTimers();
-        successCallback(data);
+
+        var token = jwt_decode(data);
+        if (token.status === "VALID") {
+            successCallback(data);
+        } else {
+            console.log("Server rejected proof: ", token.status);
+            failureCallback("Server rejected the proof", data);
+        }
     } else {
         // Failure
         failure("Request for proof from server failed. Returned status of " + xhr.status, xhr);
-    }
-}
-
-function handleFailedProofFromServer(xhr) {
-    if(xhr.status === 200) {
-        // Success
-        var data = xhr.responseText;
-        console.log("Failed proof data: ", data);
-
-        cancelTimers();
-        failureCallback("Server rejected the proof", data);
-    } else {
-        // Failure
-        failure("Request for unsigned proof from server failed. Returned status of " + xhr.status, xhr);
     }
 }
 
