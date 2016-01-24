@@ -277,6 +277,9 @@ function handleFallbackStatusUpdate(xhr) {
             case "\"SUCCESS\"":
                 handleStatusMessageClientConnected("SUCCESS");
                 break;
+            case "\"CANCELLED\"":
+                cancelSession();
+                break;
             case "\"FAILED\"":
                 handleStatusMessageClientConnected("FAILED");
                 break;
