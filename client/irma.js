@@ -443,22 +443,6 @@ function handleFailedProofFromServer(xhr) {
     }
 }
 
-function createJwt(privatekey, isReq) {
-    if (privatekey != null) {
-        var prvKey = KEYUTIL.getKey(privatekey);
-        var alg = "RS256";
-    } else {
-        var prvKey = null;
-        var alg = "none";
-    }
-
-    var header = JSON.stringify({alg: alg, typ: "JWT"});
-    var payload = {sub: "issue_request", iss: "testip", iat: Math.floor(Date.now() / 1000)};
-    $.extend(payload, {"iprequest": isReq});
-
-    return KJUR.jws.JWS.sign(alg, header, payload, prvKey);
-}
-
 function base64url(src) {
     var res = btoa(src);
 
