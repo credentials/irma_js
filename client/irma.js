@@ -1,5 +1,4 @@
 var webServer = "";
-const serverPage = "authenticate.html";
 var popup;
 
 var state;
@@ -182,6 +181,7 @@ function doInitialRequest(request, contenttype, success_cb, cancel_cb, failure_c
 
     if (ua === UserAgent.Desktop) {
         // Popup code
+        var serverPage = (action == Action.Issuing) ? "issue.html" : "verify.html";
         popup = window.open(webServer + serverPage, 'name','height=400,width=640');
         if (window.focus) {
             popup.focus();

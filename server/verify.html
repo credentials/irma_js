@@ -1,0 +1,29 @@
+<html>
+    <head>
+        <title>Verifying IRMA attributes</title>
+        <link rel="stylesheet" type="text/css" href="css/irma.css">
+        <script type="text/javascript" src="../bower_components/jquery/dist/jquery.js"></script>
+        <script type="text/javascript" src="../bower_components/jquery-qrcode/dist/jquery.qrcode.js"></script>
+        <script type="text/javascript" src="bundle.js" async defer></script>
+    </head>
+    <body>
+        <div class="irma_page">
+            <div class="irma_content">
+                <img src="img/irma_logo_160px.png" class="irma_logo_top" alt="IRMA logo"></img>
+                <div class="irma_title">showing attribute(s)</div>
+                <p id="irma_text"> A website requested that you disclose some IRMA attributes. Either scan the QR code with your phone, or press the card reader button to continue.</p>
+                <div class="irma_option_container">
+                    <div id="qrcode" class="irma_option_box"></div>
+                    <div class="irma_option_box">
+                        <img width="128px" height="128px" src="img/pc_client3.png"></img>
+                    </div>
+                </div>
+                </p>
+            </div>
+            <div class="irma_button_box">
+                <button class="irma_button" id="help_button">Help</button>
+                <button class="irma_button" id="cancel_button">Cancel</button>
+            </div>
+        </div>
+    </body>
+</html>
