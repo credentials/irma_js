@@ -15,12 +15,14 @@ $font-stack: Ubuntu, sans-serif;
 
 body {
     font: 100% $font-stack;
+    font-size: 14px;
     background-color: $irma-background-color;
     padding-top: 1px;
 }
 
 p {
     color: $irma-dark-blue;
+    line-height: 130%;
 }
 
 p.error {
