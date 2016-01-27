@@ -5,7 +5,7 @@ var state;
 const State = {
     Initialized: Symbol(),
     PopupReady: Symbol(),
-    VerificationSessionStarted: Symbol(),
+    SessionStarted: Symbol(),
     ClientConnected: Symbol(),
     Cancelled: Symbol(),
     Done: Symbol()
@@ -13,7 +13,7 @@ const State = {
 
 const StateMap = {
     [State.Initialized]: "Initialized",
-    [State.VerificationSessionStarted]: "VSS",
+    [State.SessionStarted]: "SessionStarted",
     [State.ClientConnected]: "ClientConnected",
     [State.PopupReady]: "PopupReady",
     [State.Cancelled]: "Cancelled",
@@ -109,7 +109,7 @@ function handleMessage(event) {
                 return;
             }
 
-            if (state == State.VerificationSessionStarted) {
+            if (state == State.SessionStarted) {
                 sendSessionToPopup();
             } else {
                 // Apparently session data is slow to come in
@@ -240,7 +240,7 @@ function handleInitialServerMessage(xhr) {
             console.log("Sending delayed popup");
             sendSessionToPopup();
         }
-        state = State.VerificationSessionStarted;
+        state = State.SessionStarted;
     } else if (xhr.status !== 200) {
         var msg = "Initial call to server API failed. Returned status of " + xhr.status;
         failure(msg);
@@ -290,7 +290,7 @@ function handleFallbackStatusUpdate(xhr) {
         var data = xhr.responseText;
         switch(data) {
             case "\"CONNECTED\"":
-                handleStatusMessageVerificationSessionStarted("CONNECTED");
+                handleStatusMessageSessionStarted("CONNECTED");
                 break;
             case "\"DONE\"":
                 handleStatusMessageClientConnected("DONE");
@@ -337,8 +337,8 @@ function receiveStatusMessage(data) {
     }
 
     switch(state) {
-        case State.VerificationSessionStarted:
-            handleStatusMessageVerificationSessionStarted(msg);
+        case State.SessionStarted:
+            handleStatusMessageSessionStarted(msg);
             break;
         case State.ClientConnected:
             handleStatusMessageClientConnected(msg);
@@ -349,10 +349,10 @@ function receiveStatusMessage(data) {
     }
 }
 
-function handleStatusMessageVerificationSessionStarted(msg) {
+function handleStatusMessageSessionStarted(msg) {
     switch(msg) {
         case "CONNECTED":
-            if (state === State.VerificationSessionStarted) {
+            if (state === State.SessionStarted) {
                 console.log("Client device has connected with the server");
                 state = State.ClientConnected;
                 sendMessageToPopup({type: "clientConnected"});
