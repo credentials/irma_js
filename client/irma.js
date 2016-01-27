@@ -4,9 +4,9 @@ var popup;
 var state;
 const State = {
     Initialized: Symbol(),
+    PopupReady: Symbol(),
     VerificationSessionStarted: Symbol(),
     ClientConnected: Symbol(),
-    PopupReady: Symbol(),
     Cancelled: Symbol(),
     Done: Symbol()
 }
@@ -108,10 +108,13 @@ function handleMessage(event) {
                 closePopup();
                 return;
             }
-            sendMessageToPopup({
-                type: "tokenData",
-                message: sessionPackage
-            });
+
+            if (state == State.VerificationSessionStarted) {
+                sendSessionToPopup();
+            } else {
+                // Apparently session data is slow to come in
+                state = State.PopupReady;
+            }
             break;
         case "userCancelled":
             cancelSession();
@@ -127,6 +130,13 @@ function handleMessage(event) {
             console.log("Didn't expect the following message from the popup", msg);
             break;
     }
+}
+
+function sendSessionToPopup() {
+    sendMessageToPopup({
+        type: "tokenData",
+        message: sessionPackage
+    });
 }
 
 function sendMessageToPopup(data) {
@@ -155,6 +165,8 @@ function verify(verificationRequest, success_cb, cancel_cb, failure_cb) {
 
 function doInitialRequest(request, contenttype, success_cb, cancel_cb, failure_cb) {
     state = State.Initialized;
+
+    sessionPackage = {};
 
     successCallback = success_cb;
     cancelCallback = cancel_cb;
@@ -219,10 +231,16 @@ function handleInitialServerMessage(xhr) {
         };
         console.log("sessionPackage", sessionPackage);
 
-        state = State.VerificationSessionStarted;
         setupClientMonitoring();
         setupFallbackMonitoring();
         connectClientToken();
+
+        if (state == State.PopupReady) {
+            // Popup was already ready, send session data now
+            console.log("Sending delayed popup");
+            sendSessionToPopup();
+        }
+        state = State.VerificationSessionStarted;
     } else if (xhr.status !== 200) {
         var msg = "Initial call to server API failed. Returned status of " + xhr.status;
         failure(msg);
