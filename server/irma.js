@@ -9,6 +9,8 @@ function handleMessage(event) {
                 text: JSON.stringify(msg.message),
                 size: 128,
             });
+            $("#spinner").hide();
+            $(".irma_option_container").show();
             break;
         case "clientConnected":
             showMessage("Please complete the verification on your IRMA token");
