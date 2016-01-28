@@ -8,8 +8,15 @@ const State = {
     SessionStarted: Symbol(),
     ClientConnected: Symbol(),
     Cancelled: Symbol(),
+    Timeout: Symbol(),
     Done: Symbol()
 }
+
+// Extra state, this flag is set when we timeout locally but the
+// status socket is still active. After this flag is set, we assume
+// that errors while polling (if the status socket dies) are due to
+// a timeout.
+var sessionTimedOut = false;
 
 const StateMap = {
     [State.Initialized]: "Initialized",
@@ -17,6 +24,7 @@ const StateMap = {
     [State.ClientConnected]: "ClientConnected",
     [State.PopupReady]: "PopupReady",
     [State.Cancelled]: "Cancelled",
+    [State.Timeout]: "Timeout",
     [State.Done]: "Done"
 }
 
@@ -32,6 +40,8 @@ const UserAgent = {
 }
 
 var sessionPackage;
+var sessionRequest;
+
 var successCallback;
 var cancelCallback;
 var failureCallback;
@@ -43,7 +53,10 @@ var action;
 var actionPath;
 
 const STATUS_CHECK_INTERVAL = 500;
+const DEFAULT_TIMEOUT = 120 * 1000;
+
 var fallbackTimer;
+var timeoutTimer;
 
 function info() {
     console.log("VerificationServer:", webServer);
@@ -167,6 +180,8 @@ function doInitialRequest(request, contenttype, success_cb, cancel_cb, failure_c
     state = State.Initialized;
 
     sessionPackage = {};
+    sessionRequest = request;
+    sessionTimedOut = false;
 
     successCallback = success_cb;
     cancelCallback = cancel_cb;
@@ -233,6 +248,7 @@ function handleInitialServerMessage(xhr) {
 
         setupClientMonitoring();
         setupFallbackMonitoring();
+        setupTimeoutMonitoring();
         connectClientToken();
 
         if (state == State.PopupReady) {
@@ -281,6 +297,34 @@ function setupFallbackMonitoring() {
 }
 
 /*
+ * This function makes sure that just before the
+ * session to the server times out, we do a manual
+ * timeout if the statusSocket is not connected.
+ */
+function setupTimeoutMonitoring() {
+    console.log("Timeout monitoring started");
+    var checkTimeoutMonitor = function () {
+        console.log("timeout monitoring fired");
+        if ( typeof(statusWebsocket) === "undefined" ||
+             statusWebsocket.readyState !== 1 ) {
+            // Status WebSocket is not active, manually call timeout
+            console.log("Manually timing out");
+            timeoutSession();
+        } else {
+            // We should timeout shortly, setting state reflect this
+            sessionTimedOut = true;
+        }
+    }
+
+    var timeout = DEFAULT_TIMEOUT;
+    if (sessionRequest.timeout > 0) {
+        timeout = sessionRequest.timeout * 1000;
+    }
+
+    timeoutTimer = setTimeout(checkTimeoutMonitor, timeout);
+}
+
+/*
  * Handle polled status updates. There is no state , so status
  * messages will be repeatedly processed by this function.
  */
@@ -303,6 +347,12 @@ function handleFallbackStatusUpdate(xhr) {
                 break;
         }
     } else {
+        if (sessionTimedOut) {
+            // When timed-out we can ignore errors.
+            console.log("Assuming polling error is due to timeout");
+            timeoutSession();
+            return;
+        }
         failure("Status poll from server failed. Returned status of " + xhr.status, xhr);
     }
 }
@@ -310,6 +360,9 @@ function handleFallbackStatusUpdate(xhr) {
 function cancelTimers () {
     if (typeof(fallbackTimer) !== "undefined") {
         clearTimeout(fallbackTimer);
+    }
+    if (typeof(timeoutTimer) !== "undefined") {
+        clearTimeout(timeoutTimer);
     }
 }
 
@@ -333,6 +386,11 @@ function receiveStatusMessage(data) {
 
     if (msg === "CANCELLED") {
         cancelSession();
+        return;
+    }
+
+    if (msg === "TIMEOUT") {
+        timeoutSession();
         return;
     }
 
@@ -408,6 +466,22 @@ function cancelSession() {
     cancelTimers();
     cancelCallback("User cancelled authentication");
 }
+
+function timeoutSession() {
+    console.log("Session timeout");
+    state = State.Timeout;
+
+    // Close websocket if it is still open
+    if ( typeof(statusWebsocket) === "undefined" ||
+         statusWebsocket.readyState === 1 ) {
+        statusWebsocket.close();
+    }
+
+    closePopup();
+    cancelTimers();
+    cancelCallback("Session timeout, please try again");
+}
+
 
 function handleProofMessageFromServer(xhr) {
     if(xhr.status === 200) {
