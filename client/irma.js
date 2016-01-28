@@ -1,3 +1,5 @@
+var jwt_decode = require('jwt-decode');
+
 var webServer = "";
 var popup;
 
