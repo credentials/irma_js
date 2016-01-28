@@ -333,6 +333,9 @@ function handleFallbackStatusUpdate(xhr) {
         // Success
         var data = xhr.responseText;
         switch(data) {
+            case "\"INITIALIZED\"":
+                // No need to do anything
+                break;
             case "\"CONNECTED\"":
                 handleStatusMessageSessionStarted("CONNECTED");
                 break;
