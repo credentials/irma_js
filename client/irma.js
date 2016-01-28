@@ -1,7 +1,6 @@
 var webServer = "";
 var popup;
 
-var state;
 const State = {
     Initialized: Symbol(),
     PopupReady: Symbol(),
@@ -11,6 +10,7 @@ const State = {
     Timeout: Symbol(),
     Done: Symbol()
 }
+var state = State.Done;
 
 // Extra state, this flag is set when we timeout locally but the
 // status socket is still active. After this flag is set, we assume
@@ -41,6 +41,7 @@ const UserAgent = {
 
 var sessionPackage;
 var sessionRequest;
+var sessionCounter = 0;
 
 var successCallback;
 var cancelCallback;
@@ -177,7 +178,14 @@ function verify(verificationRequest, success_cb, cancel_cb, failure_cb) {
 }
 
 function doInitialRequest(request, contenttype, success_cb, cancel_cb, failure_cb) {
+    // Check if there is an old unfinished session going on
+    if (state !== State.Cancelled && state !== State.Timeout && state !== State.Done) {
+        console.log("Found previously active session, cancelling that one first");
+        cancelSession(true);
+    }
+
     state = State.Initialized;
+    sessionCounter++;
 
     sessionPackage = {};
     sessionRequest = request;
@@ -208,6 +216,7 @@ function doInitialRequest(request, contenttype, success_cb, cancel_cb, failure_c
 
     if (ua === UserAgent.Desktop) {
         // Popup code
+        console.log("Trying to open popup again");
         var serverPage = (action == Action.Issuing) ? "issue.html" : "verify.html";
         popup = window.open(webServer + serverPage, 'name','height=400,width=640');
         if (window.focus) {
@@ -218,11 +227,17 @@ function doInitialRequest(request, contenttype, success_cb, cancel_cb, failure_c
     var xhr = new XMLHttpRequest();
     xhr.open('POST', encodeURI(actionPath));
     xhr.setRequestHeader('Content-Type', contenttype);
-    xhr.onload = function() { handleInitialServerMessage(xhr) };
+    var currentSessionCounter = sessionCounter;
+    xhr.onload = function() { handleInitialServerMessage(xhr, currentSessionCounter) };
     xhr.send(request);
 };
 
-function handleInitialServerMessage(xhr) {
+function handleInitialServerMessage(xhr, scounter) {
+    if (scounter != sessionCounter) {
+        console.log("Intervering result from old session, ignoring!!!");
+        return;
+    }
+
     if (xhr.status === 200) {
         try {
             sessionData = JSON.parse(xhr.responseText);
@@ -461,13 +476,15 @@ function closePopup() {
     }
 }
 
-function cancelSession() {
-    console.log("Token cancelled authentication");
+function cancelSession(cancelOld=false) {
+    console.log("Token cancelled authentication", cancelOld);
     state = State.Cancelled;
 
-    closePopup();
     cancelTimers();
-    cancelCallback("User cancelled authentication");
+    if (!cancelOld) {
+        closePopup();
+        cancelCallback("User cancelled authentication");
+    }
 }
 
 function timeoutSession() {
