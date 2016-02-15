@@ -29,7 +29,7 @@ First we tell `irma.js` where to find the API server
 Next we load the client itself:
 
 ```html
-<script src="../client/irma.js" type="text/javascript" defer async>
+<script src="https://demo.irmacard.org/tomcat/irma_api_server/client/irma.js" type="text/javascript" defer async>
 ```
 
 ## A simple verification
