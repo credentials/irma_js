@@ -39,7 +39,7 @@ $(function() {
 
         btn.addEventListener("click", function() {
             console.log("Button clicked");
-            IRMA.verify(sprequest, success_fun, error_fun);
+            IRMA.verify(sprequest, success_fun, cancel_fun, error_fun);
         });
     }
 
