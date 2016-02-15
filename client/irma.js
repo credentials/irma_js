@@ -367,7 +367,8 @@ function handleFallbackStatusUpdate(xhr) {
                 break;
         }
     } else {
-        if (sessionTimedOut) {
+        // TODO: for now also assume timeout on 400 status code
+        if (sessionTimedOut || xhr.status === 400) {
             // When timed-out we can ignore errors.
             console.log("Assuming polling error is due to timeout");
             timeoutSession();
