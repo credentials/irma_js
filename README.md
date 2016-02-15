@@ -1,17 +1,113 @@
 IRMA JavaScript client
 ======================
 
-*For now this project is under heavy development, and should not yet be deployed.*
+*Please expect the API offered by irma_js to change in the future*
 
-This project contains all the web sources to interact with a verification API. It contains three parts:
+This project contains all the web sources to interact with an IRMA API server. It offers a library that allows you to use the API server to:
+
+ * Verify IRMA attributes. You specify which attributes, the library handles the user interaction and the communication with the API server. Finally, the API server signes a JWT (JSON Web Token) containing the attributes (provided the attributes are valid), the library returns this signed JWT.
+ * Issue IRMA attributes. You put the credentials to be issued in a signed JWT, the library handles the user interaction and the communication with the API server. (The API server does need to allow you to issue these credentials).
+
+This javascript package contains three parts:
 
  * `client`: The IRMA JavaScript library that you can use on your website if you want to integrate IRMA verification.
  * `examples`: Example pages that use various aspects of the IRMA JavaScript library
  * `server`: The verification pages shown by the verification server.
 
-If you want to use IRMA on your own pages we recommend you use an existing verification server and rely on the examples in the `examples` directory to guide you. *FIXME: More extensive examples!*
 
-## Development
+# Getting started
+
+In case you quickly want to get started with setting up IRMA verification for your website please proceed as follows. First, you need an API server. For testing, feel free to user our API server. It is hosted at `https://demo.irmcard.org/tomcat/irma_api_server/`. (Please note that it only allows verifies and issues credentials in the demo domain.)
+
+First we tell `irma.js` where to find the API server
+
+```html
+<meta value="https://demo.irmacard.org/tomcat/irma_api_server/server/" name="irma-web-server">
+<meta value="https://demo.irmacard.org/tomcat/irma_api_server/api/v2/" name="irma-api-server">
+```
+
+Next we load the client itself:
+
+```html
+<script src="../client/irma.js" type="text/javascript" defer async>
+```
+
+## A simple verification
+
+We can now use `irma.js` for a simple verification. First, we specify the verification request:
+
+```javascript
+var sprequest = {
+    "validity": 60,
+    "request": {
+        "content": [
+            {
+                "label": "over12",
+                "attributes": ["MijnOverheid.ageLower.over12"]
+            },
+        ]
+    }
+};
+```
+
+in this case we would like to check that the user is over 12 years old, and we only accept the `MijnOverheid.ageLower.over12` attribute prove this. Next, call `IRMA.verify` when you want to verify the attribute:
+
+```javascript
+IRMA.verify(sprequest, success, warning, error);
+```
+
+Since this causes a popup please make sure to bind this to a user action, for example a button, and specify the callbacks if you want to see any result from the call
+
+```javascript
+var success = function(jwt) { console.log(jwt); }
+var warning = function() { console.log("Warning:", arguments); }
+var error = function() { console.log("Error:", arguments); }
+btn.addEventListener("click", function() {
+    console.log("Button clicked");
+    IRMA.verify(sprequest, success, warning, error);
+});
+```
+
+The `success`, `warning`, `error` callbacks are only examples, you may wish to redefine them based on your scenario. Most of this code was taken from the `custom-button` example in `examples`. For a more complete scenario, see `examples/multiple-attributes` ([live demo](https://demo.irmacard.org/tomcat/irma_api_server/examples/multiple-attributes.html)).
+
+## A simple issuance
+
+Issuing a credential is equally easy. First we build a JSON object describing the credential(s) to issue.
+
+```javascript
+var iprequest = {
+    timeout: 60,
+    request: {
+        "credentials": [
+            {
+                "credential": "MijnOverheid.address",
+                "attributes": {
+                    "country": "The Netherlands",
+                    "city": "Nijmegen",
+                    "street": "Toernooiveld 212",
+                    "zipcode": "6525 EC"
+                }
+            }
+        ],
+    }
+};
+```
+
+Then your backend application creates a signed JWT using this request so that the API server can check that you are indeed eligible to issue this credential. Our testing API server is very permissive (only for credentials in the demo domain), but it does require a JWT. If you are just testing you can make one using `irma.js`:
+
+```
+var jwt = IRMA.createUnsignedJWT(iprequest);
+```
+
+Next, just make a call to `IRMA.issue` to issue the credentials:
+
+```
+IRMA.issue(jwt, success, warning, error);
+```
+
+For a full example, see `examples\issue` ([live demo](https://demo.irmacard.org/tomcat/irma_api_server/examples/issue.html)).
+
+# Development
 
 Some notes on development
 
