@@ -13,7 +13,7 @@ function handleMessage(event) {
             $(".irma_option_container").show();
             break;
         case "clientConnected":
-            showMessage("Please complete the verification on your IRMA token");
+            showMessage("Please follow the instructions on your IRMA token");
             $(".irma_option_container").hide();
             break;
         case "done":
