@@ -367,6 +367,11 @@ function handleFallbackStatusUpdate(xhr) {
                 break;
         }
     } else {
+        // Ignore all errors when already done
+        if ( state == State.Done || state == State.Cancelled ) {
+            return;
+        }
+
         // TODO: for now also assume timeout on 400 status code
         if (sessionTimedOut || xhr.status === 400) {
             // When timed-out we can ignore errors.
