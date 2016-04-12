@@ -429,7 +429,7 @@ function receiveStatusMessage(data) {
             handleStatusMessageClientConnected(msg);
             break;
         default:
-            failure("ERROR: unknown current state", state);
+            failure("ERROR: unknown current state", StateMap[state]);
             break;
     }
 }
