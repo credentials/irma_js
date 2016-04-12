@@ -138,6 +138,6 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks("grunt-contrib-copy");
     grunt.loadNpmTasks("grunt-string-replace");
 
-    grunt.registerTask("default", ["watch"]);
+    grunt.registerTask("default", ["string-replace", "watch"]);
     grunt.registerTask("build", ["browserify", "sass", "copy", "string-replace"]);
 };
