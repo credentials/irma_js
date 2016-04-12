@@ -134,25 +134,33 @@ to build the libraries and examples. See below for how to setup server URLs for 
 
 to keep rebuilding the files as they change. (Make sure that you run `grunt build` at least once to make sure everything gets build, or just run `grunt build watch` to build and keep building.)
 
-## URLs for verification pages and verification apis
+## URLs for api web pages and apis
 
 This project relies on two URLs for verifications:
 
- * The examples depend on the url of the verification server, they use it to communicate with the verification server. To set the verification server's url using grunt, specify it using the `--verification_server_url=<URL>` option.
- * The verification server pages need to know the location of the verification API backend to perform the actual verifications. To set the api's url using grunt, specify it using the `--verification_api_url=<URL>` option.
+ * The examples depend on the api server's web-pages, they use this to show popups etc, you can set the api web server's url using grunt, specify it using the `--web_server_url=<URL>` option.
+ * The api server's pages need to know the location of the API backend to perform the actual verifications and issuances. To set the api's url using grunt, specify it using the `--api_server_url=<URL>` option.
 
-Note that you only need the latter if you are working on the server pages. If this is the case, you might also be interested the shortcut when you run a local verification server as explained next.
+Note that you only need the latter if you are working on the server pages. If this is the case, you might also be interested the shortcut when you run a local verification server as explained next. In particular, it also describes how you can use the `--server_url=<URL>` option to specify both the web pages and the API location in one go if you use the default setup.
 
 ## Running a local verification server
 
-If you are running a local verification server using the `irma_verification_server` project you might as well use it to host the web pages as well (and thus avoid CORS problems). First, make sure that the assembled output is written to the `webapp` directory. If `irma_verification_server` is in the same directory is `irma_js` run:
+If you are running a local api server using the `irma_api_server` project you might as well use it to host the web pages as well (and thus avoid CORS problems). First, make sure that the assembled output is written to the `webapp` directory. If `irma_api_server` is in the same directory is `irma_js` run:
 
-    ln -s ../irma_verification_server/src/main/webapp/ build
+    ln -s ../irma_api_server/src/main/webapp/ build
 
 Then simply specify the root of the servlet when running grunt:
 
-     grunt --server_url="http://<HOST>:8080/irma_verification_server/"
+     grunt --server_url="http://<HOST>:8080/irma_api_server/"
 
 If you want to test your application using an external token, make sure that `<HOST>` is either is an ip address that the token can reach, or is resolvable to one by the token. You can then run the example by visiting
 
-    http://<HOST>:8080/irma_verification_server/examples/custom-button.html
+    http://<HOST>:8080/irma_api_server/examples/custom-button.html
+
+or
+
+    http://<HOST>:8080/irma_api_server/examples/issue.html
+
+or
+
+    http://<HOST>:8080/irma_api_server/examples/multiple-attributes.html
