@@ -4,8 +4,7 @@ var iprequest = {
     request: {
         "credentials": [
             {
-                "credential": "MijnOverheid.address",
-                "validity": 1483228800,
+                "credential": "irma-demo.MijnOverheid.address",
                 "attributes": {
                     "country": "The Netherlands",
                     "city": "Nijmegen",
@@ -18,7 +17,7 @@ var iprequest = {
             {
                 "label": "Age (higher)",
                 "attributes": {
-                    "MijnOverheid.ageHigher": "present"
+                    "irma-demo.MijnOverheid.ageHigher": "present"
                 }
             }
         ]

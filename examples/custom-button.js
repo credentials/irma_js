@@ -7,11 +7,11 @@ $(function() {
             "content": [
                 {
                     "label": "over12",
-                    "attributes": ["MijnOverheid.ageLower.over12"]
+                    "attributes": ["irma-demo.MijnOverheid.ageLower.over12"]
                 },
                 {
-                    "label": "over16",
-                    "attributes": ["MijnOverheid.ageLower.over16"]
+                    "label": "name",
+                    "attributes": ["irma-demo.MijnOverheid.fullName.firstname"]
                 }
             ]
         }
