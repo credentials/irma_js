@@ -416,6 +416,7 @@ function receiveStatusMessage(data) {
     }
 
     if (msg === "TIMEOUT") {
+        console.log("Received status message TIMEOUT, timing out");
         timeoutSession();
         return;
     }
@@ -452,7 +453,11 @@ function handleStatusMessageClientConnected(msg) {
     switch(msg) {
         case "DONE":
             console.log("Server returned DONE");
+
             state = State.Done;
+            closePopup();
+            closeWebsocket();
+
             if (action == Action.Verifying)
                 finishVerification();
             else if (action == Action.Issuing)
@@ -465,13 +470,10 @@ function handleStatusMessageClientConnected(msg) {
 }
 
 function finishIssuance() {
-    closePopup();
     successCallback();
 }
 
 function finishVerification() {
-    closePopup();
-
     var xhr = new XMLHttpRequest();
     xhr.open('GET', encodeURI( actionPath + sessionId + "/getproof"));
     xhr.onload = function () { handleProofMessageFromServer(xhr); };
@@ -495,16 +497,19 @@ function cancelSession(cancelOld=false) {
     }
 }
 
-function timeoutSession() {
-    console.log("Session timeout");
-    state = State.Timeout;
-
+function closeWebsocket() {
     // Close websocket if it is still open
     if ( typeof(statusWebsocket) === "undefined" ||
          statusWebsocket.readyState === 1 ) {
         statusWebsocket.close();
     }
+}
 
+function timeoutSession() {
+    console.log("Session timeout");
+    state = State.Timeout;
+
+    closeWebsocket();
     closePopup();
     cancelTimers();
     cancelCallback("Session timeout, please try again");
