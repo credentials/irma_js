@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>IRMA: Manually issue demo credentials</title>
+        <meta name="irma-web-server" value="<IRMA_WEB_SERVER>">
+        <meta name="irma-api-server" value="<IRMA_API_SERVER>">
+
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <script type="text/javascript" src="../bower_components/jquery/dist/jquery.js"></script>
+        <script type="text/javascript" src="../bower_components/handlebars/handlebars.js"></script>
+
+        <script type="text/javascript" src="../client/irma.js" async defer></script>
+        <script type="text/javascript" src="issue-all.js"></script>
+
+        <script id="credentials-template" type="text/x-handlebars-template">
+            <hr />
+            {{#each creds}}
+            <form class="form-horizontal" id="{{credential}}">
+                <div class="row">
+                  <div class="col-sm-3"></div>
+                  <div class="col-sm-9">
+                    <h5>{{credential}}</h5>
+                  </div>
+                </div>
+                {{#eachInMap attributes}}
+                  <div class="form-group" id="formGroup.{{../credential}}.{{key}}">
+                    <label for="inputEmail3" class="col-sm-3 control-label">{{key}}</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" id="input.{{../credential}}.{{key}}" value="{{value}}">
+                    </div>
+                  </div>
+                {{/eachInMap}}
+            </form>
+            <hr />
+            {{/each}}
+        </script>
+
+        <link href="../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    </head>
+    <body>
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12 col-md-2 col-lg-3"></div>
+                <div class="col-xs-12 col-md-8 col-lg-6">
+                    <h2>Manually issue demo credentials</h2>
+
+                    <div id="alert_box"></div>
+
+                    <p>
+                        This demo allows you to issue many of the demo credentials
+                        to your own device. This is <b>only</b> possible because these
+                        are demo credentials. For any other type of credentials
+                        strict restrictions would be in place, and it would not
+                        be possible to change the values, as you can do here.
+                    </p>
+
+                    <button id="irma_btn_top" class="btn btn-primary">Issue credentials</button>
+
+                    <div id=credential-forms>
+                    </div>
+
+                    <button id="irma_btn_bottom" class="btn btn-primary">Issue credentials</button>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
