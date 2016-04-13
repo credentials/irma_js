@@ -390,6 +390,9 @@ function cancelTimers () {
     if (typeof(timeoutTimer) !== "undefined") {
         clearTimeout(timeoutTimer);
     }
+    if (typeof(checkTimeoutMonitor) !== "undefined") {
+        clearTimeout(checkTimeoutMonitor);
+    }
 }
 
 function connectClientToken() {
@@ -470,6 +473,7 @@ function handleStatusMessageClientConnected(msg) {
 }
 
 function finishIssuance() {
+    cancelTimers();
     successCallback();
 }
 
