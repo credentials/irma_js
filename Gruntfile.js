@@ -9,7 +9,7 @@ module.exports = function (grunt) {
         console.log("INFO: either set server_url, or web_server_url and" +
                     " api_server_url to have working local phone examples");
     }
-    server_url = grunt.option("server_url") || "http://localhost:8080/irma_api_server/";
+    server_url = grunt.option("server_url") || "https://demo.irmacard.org/tomcat/irma_api_server/";
     web_server_url = grunt.option("web_server_url") || server_url +  "server/";
     api_server_url = grunt.option("api_server_url") || server_url + "api/v2/";
 
