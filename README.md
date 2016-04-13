@@ -43,14 +43,14 @@ var sprequest = {
         "content": [
             {
                 "label": "over12",
-                "attributes": ["MijnOverheid.ageLower.over12"]
+                "attributes": ["irma-demo.MijnOverheid.ageLower.over12"]
             },
         ]
     }
 };
 ```
 
-in this case we would like to check that the user is over 12 years old, and we only accept the `MijnOverheid.ageLower.over12` attribute prove this. Next, call `IRMA.verify` when you want to verify the attribute:
+in this case we would like to check that the user is over 12 years old, and we only accept the `irma-demo.MijnOverheid.ageLower.over12` attribute prove this. Next, call `IRMA.verify` when you want to verify the attribute:
 
 ```javascript
 IRMA.verify(sprequest, success, warning, error);
@@ -68,7 +68,7 @@ btn.addEventListener("click", function() {
 });
 ```
 
-The `success`, `warning`, `error` callbacks are only examples, you may wish to redefine them based on your scenario. Most of this code was taken from the `custom-button` example in `examples`. For a more complete scenario, see `examples/multiple-attributes` ([live demo](https://demo.irmacard.org/tomcat/irma_api_server/examples/multiple-attributes.html)).
+The `success`, `warning`, `error` callbacks are only examples, you may wish to redefine them based on your scenario. Most of this code was taken from the `verify` example in `examples`. For a more complete scenario, see `examples/multiple-attributes` ([live demo](https://demo.irmacard.org/tomcat/irma_api_server/examples/multiple-attributes.html)).
 
 ## A simple issuance
 
@@ -80,7 +80,7 @@ var iprequest = {
     request: {
         "credentials": [
             {
-                "credential": "MijnOverheid.address",
+                "credential": "irma-demo.MijnOverheid.address",
                 "attributes": {
                     "country": "The Netherlands",
                     "city": "Nijmegen",
