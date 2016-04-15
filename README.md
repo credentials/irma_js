@@ -62,6 +62,7 @@ Since this causes a popup please make sure to bind this to a user action, for ex
 var success = function(jwt) { console.log(jwt); }
 var warning = function() { console.log("Warning:", arguments); }
 var error = function() { console.log("Error:", arguments); }
+var btn = document.getElementById("myButtonId");
 btn.addEventListener("click", function() {
     console.log("Button clicked");
     IRMA.verify(sprequest, success, warning, error);
