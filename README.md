@@ -69,7 +69,40 @@ btn.addEventListener("click", function() {
 });
 ```
 
-The `success`, `warning`, `error` callbacks are only examples, you may wish to redefine them based on your scenario. Most of this code was taken from the `verify` example in `examples`. For a more complete scenario, see `examples/multiple-attributes` ([live demo](https://demo.irmacard.org/tomcat/irma_api_server/examples/multiple-attributes.html)).
+The `success`, `warning`, `error` callbacks are only examples, you may wish to redefine them based on your scenario. Most of this code was taken from the `verify` example in `examples`.
+
+A full working minimal example is:
+
+```HTML
+<html>
+    <head>
+        <meta value="https://demo.irmacard.org/tomcat/irma_api_server/server/" name="irma-web-server">
+        <meta value="https://demo.irmacard.org/tomcat/irma_api_server/api/v2/" name="irma-api-server">
+        <script src="https://demo.irmacard.org/tomcat/irma_api_server/client/irma.js" type="text/javascript" defer async></script>
+        <script type="text/javascript">
+            var sprequest = {
+                "request": {
+                    "content": [
+                        {
+                            "label": "18+",
+                            "attributes": ["irma-demo.MijnOverheid.ageLower.over18"]
+                        },
+                    ]
+                }
+            };
+            var success = function(jwt) { console.log("Success:", jwt); alert(“Success”); }
+            var warning = function() { console.log("Warning:", arguments); }
+            var error = function() { console.log("Error:", arguments); }
+            var clicked = function() { console.log("Clicked"); IRMA.verify(sprequest, success, warning, error); };
+        </script>
+    </head>
+    <body>
+        <button onclick="clicked();">ClickMe</button>
+    </body>
+</html>
+```
+
+For a more complete scenario, see `examples/multiple-attributes` ([live demo](https://demo.irmacard.org/tomcat/irma_api_server/examples/multiple-attributes.html)).
 
 ## A simple issuance
 
