@@ -185,16 +185,16 @@ If you are running a local api server using the `irma_api_server` project you mi
 
 Then simply specify the root of the servlet when running grunt:
 
-     grunt --server_url="http://<HOST>:8080/irma_api_server/"
+     grunt --server_url="http://<HOST>:8081/irma_api_server/"
 
 If you want to test your application using an external token, make sure that `<HOST>` is either is an ip address that the token can reach, or is resolvable to one by the token. You can then run the example by visiting
 
-    http://<HOST>:8080/irma_api_server/examples/custom-button.html
+    http://<HOST>:8081/irma_api_server/examples/custom-button.html
 
 or
 
-    http://<HOST>:8080/irma_api_server/examples/issue.html
+    http://<HOST>:8081/irma_api_server/examples/issue.html
 
 or
 
-    http://<HOST>:8080/irma_api_server/examples/multiple-attributes.html
+    http://<HOST>:8081/irma_api_server/examples/multiple-attributes.html
