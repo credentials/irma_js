@@ -39,7 +39,8 @@ $(function() {
 
         btn.addEventListener("click", function() {
             console.log("Button clicked");
-            IRMA.verify(sprequest, success_fun, cancel_fun, error_fun);
+            var jwt = IRMA.createUnsignedVerificationJWT(sprequest);
+            IRMA.verify(jwt, success_fun, cancel_fun, error_fun);
         });
     }
 

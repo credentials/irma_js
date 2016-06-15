@@ -14,7 +14,7 @@ $(function() {
     };
 
     function showError(msg) {
-        $("#alert_box").html('<div class="alert alert-danger" role="alert">' 
+        $("#alert_box").html('<div class="alert alert-danger" role="alert">'
                              + '<strong>Error:</strong> '
                              + msg + '</div>');
     };
@@ -60,7 +60,8 @@ $(function() {
             });
 
             if (notEmpty) {
-                IRMA.verify(sprequest, success_fun, showWarning, showError);
+                var jwt = IRMA.createUnsignedVerificationJWT(sprequest);
+                IRMA.verify(jwt, success_fun, showWarning, showError);
             } else {
                 showWarning("Please select at least one attribute");
             }

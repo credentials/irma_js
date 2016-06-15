@@ -165,7 +165,7 @@ $(function() {
 
         iprequest.request.credentials = resultCredentials;
         console.log(iprequest);
-        var jwt = IRMA.createUnsignedJWT(iprequest);
+        var jwt = IRMA.createUnsignedIssuanceJWT(iprequest);
         IRMA.issue(jwt, success_fun, showWarning, showError);
     };
 

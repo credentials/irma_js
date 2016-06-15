@@ -170,13 +170,12 @@ function issue(jwt, success_cb, cancel_cb, failure_cb) {
 }
 
 
-function verify(verificationRequest, success_cb, cancel_cb, failure_cb) {
+function verify(jwt, success_cb, cancel_cb, failure_cb) {
     action = Action.Verifying;
     actionPath = apiServer + "verification/";
     console.log("Action Path set to: ", actionPath);
 
-    doInitialRequest(JSON.stringify(verificationRequest), 'application/json',
-            success_cb, cancel_cb, failure_cb);
+    doInitialRequest(jwt, 'text/plain', success_cb, cancel_cb, failure_cb);
 }
 
 function doInitialRequest(request, contenttype, success_cb, cancel_cb, failure_cb) {
@@ -554,7 +553,7 @@ function base64url(src) {
     return res;
 }
 
-function createUnsignedJWT(iprequest) {
+function createUnsignedJWT(request, requesttype, subject, issuer) {
     console.log("Creating unsigned JWT!!!");
     var header = {
         alg: "none",
@@ -562,14 +561,22 @@ function createUnsignedJWT(iprequest) {
     };
 
     var payload = {
-        sub: "issue_request",
-        iss: "testip",
+        sub: subject,
+        iss: issuer,
         iat: Math.floor(Date.now() / 1000),
-        "iprequest": iprequest
     };
+    payload[requesttype] = request;
 
     return base64url(JSON.stringify(header)) + "." +
            base64url(JSON.stringify(payload)) + ".";
+}
+
+function createUnsignedIssuanceJWT(iprequest) {
+    return createUnsignedJWT(iprequest, "iprequest", "issue_request", "testip");
+}
+
+function createUnsignedVerificationJWT(sprequest) {
+    return createUnsignedJWT(sprequest, "sprequest", "verification_request", "testsp");
 }
 
 
@@ -578,4 +585,4 @@ getSetupFromMetas();
 detectUserAgent();
 window.addEventListener('message', handleMessage, false);
 
-export {verify, issue, info, createUnsignedJWT};
+export {verify, issue, info, createUnsignedIssuanceJWT, createUnsignedVerificationJWT};
