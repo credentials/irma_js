@@ -50,10 +50,17 @@ var sprequest = {
 };
 ```
 
-in this case we would like to check that the user is over 12 years old, and we only accept the `irma-demo.MijnOverheid.ageLower.over12` attribute prove this. Next, call `IRMA.verify` when you want to verify the attribute:
+in this case we would like to check that the user is over 12 years old, and we only accept the `irma-demo.MijnOverheid.ageLower.over12` attribute prove this. Next, you need to put the request in a JWT, that depending on the server's configuration, may need to be signed. If the server accepts unsigned JWT's, you can use `irma.js` to create one:
+
 
 ```javascript
-IRMA.verify(sprequest, success, warning, error);
+var jwt = IRMA.createUnsignedVerificationJWT(sprequest);
+```
+
+After that you call `IRMA.verify` when you want to verify the attribute:
+
+```javascript
+IRMA.verify(jwt, success, warning, error);
 ```
 
 Since this causes a popup please make sure to bind this to a user action, for example a button, and specify the callbacks if you want to see any result from the call
@@ -65,7 +72,8 @@ var error = function() { console.log("Error:", arguments); }
 var btn = document.getElementById("myButtonId");
 btn.addEventListener("click", function() {
     console.log("Button clicked");
-    IRMA.verify(sprequest, success, warning, error);
+    var jwt = IRMA.createUnsignedVerificationJWT(sprequest);
+    IRMA.verify(jwt, success, warning, error);
 });
 ```
 
@@ -93,7 +101,11 @@ A full working minimal example is:
             var success = function(jwt) { console.log("Success:", jwt); alert(“Success”); }
             var warning = function() { console.log("Warning:", arguments); }
             var error = function() { console.log("Error:", arguments); }
-            var clicked = function() { console.log("Clicked"); IRMA.verify(sprequest, success, warning, error); };
+            var clicked = function() {
+                console.log("Clicked");
+                var jwt = IRMA.createUnsignedVerificationJWT(sprequest);
+                IRMA.verify(jwt, success, warning, error);
+            };
         </script>
     </head>
     <body>
@@ -127,15 +139,10 @@ var iprequest = {
 };
 ```
 
-Then your backend application creates a signed JWT using this request so that the API server can check that you are indeed eligible to issue this credential. Our testing API server is very permissive (only for credentials in the demo domain), but it does require a JWT. If you are just testing you can make one using `irma.js`:
+Then your backend application creates a signed JWT using this request so that the API server can check that you are indeed eligible to issue this credential. Our testing API server is very permissive (only for credentials in the demo domain), but it does require a JWT. As in the case of verification requests, `irma.js` offers a convenience function for creating an unsigned JWT. After you have created one, just make a call to `IRMA.issue` to issue the credentials:
 
 ```
-var jwt = IRMA.createUnsignedJWT(iprequest);
-```
-
-Next, just make a call to `IRMA.issue` to issue the credentials:
-
-```
+var jwt = IRMA.createUnsignedIssuanceJWT(iprequest);
 IRMA.issue(jwt, success, warning, error);
 ```
 
