@@ -170,7 +170,20 @@ function issue(jwt, success_cb, cancel_cb, failure_cb) {
 }
 
 
-function verify(jwt, success_cb, cancel_cb, failure_cb) {
+function verify(request, success_cb, cancel_cb, failure_cb) {
+    // Also support bare (i.e., non-JWT) service provider requests for backwards compatibility
+    // We assume that the user meant to create an unsigned JWT.
+    if (typeof request == "object") {
+        console.log("WARNING: calling IRMA.verify with a bare service provider request "
+            + "is deprecated, you should pass a JWT instead. For now your request will be "
+            + "converted to an unsigned JWT, but you should consider doing this yourself "
+            + "(e.g. using IRMA.createUnsignedVerificationJWT).");
+        var jwt = createUnsignedVerificationJWT(request);
+    } else {
+        // Assume it is a JWT and let the API server figure out if it is valid
+        var jwt = request;
+    }
+
     action = Action.Verifying;
     actionPath = apiServer + "verification/";
     console.log("Action Path set to: ", actionPath);
@@ -553,7 +566,7 @@ function base64url(src) {
     return res;
 }
 
-function createUnsignedJWT(request, requesttype, subject, issuer) {
+function createJWT(request, requesttype, subject, issuer) {
     console.log("Creating unsigned JWT!!!");
     var header = {
         alg: "none",
@@ -571,12 +584,18 @@ function createUnsignedJWT(request, requesttype, subject, issuer) {
            base64url(JSON.stringify(payload)) + ".";
 }
 
+function createUnsignedJWT(iprequest) {
+    console.log("WARNING: this function is deprecated and may be removed in later "
+        + "versions. Use IRMA.createUnsignedIssuanceJWT instead.");
+    return createUnsignedIssuanceJWT(iprequest);
+}
+
 function createUnsignedIssuanceJWT(iprequest) {
-    return createUnsignedJWT(iprequest, "iprequest", "issue_request", "testip");
+    return createJWT(iprequest, "iprequest", "issue_request", "testip");
 }
 
 function createUnsignedVerificationJWT(sprequest) {
-    return createUnsignedJWT(sprequest, "sprequest", "verification_request", "testsp");
+    return createJWT(sprequest, "sprequest", "verification_request", "testsp");
 }
 
 
@@ -585,4 +604,11 @@ getSetupFromMetas();
 detectUserAgent();
 window.addEventListener('message', handleMessage, false);
 
-export {verify, issue, info, createUnsignedIssuanceJWT, createUnsignedVerificationJWT};
+export {
+    verify,
+    issue,
+    info,
+    createUnsignedJWT, // just calls createUnsignedIssuanceJWT for backwards compatibility
+    createUnsignedIssuanceJWT,
+    createUnsignedVerificationJWT
+};
