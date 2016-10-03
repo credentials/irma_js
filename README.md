@@ -116,6 +116,10 @@ A full working minimal example is:
 
 For a more complete scenario, see `examples/multiple-attributes` ([live demo](https://demo.irmacard.org/tomcat/irma_api_server/examples/multiple-attributes.html)).
 
+### Using attributes in your backend
+
+Behind the scenes, the IRMA API server produces a signed JWT containing the attributes you requested. `irma_js` returns this JWT to you to further handle these verified data in your backend. Naturally, you should always verify this JWT there too. If you want to rely on our server for now, you'll also need its ([public key](https://demo.irmacard.org/v2/data/pk.pem)). ([This page](https://demo.irmacard.org/tomcat/irma_api_server/examples/verify.html)) explicitly shows the JWT and its content.
+
 ## A simple issuance
 
 Issuing a credential is equally easy. First we build a JSON object describing the credential(s) to issue.
