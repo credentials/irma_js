@@ -194,6 +194,7 @@ If you are running a local api server using the `irma_api_server` project you mi
 
     ln -s ../irma_api_server/src/main/webapp/ build
 
+(Note: if you have already run `grunt` before creating this symlink, then a directory named `build` already exists. Be sure to remove it first!)
 Then simply specify the root of the servlet when running grunt:
 
      grunt --server_url="http://<HOST>:8081/irma_api_server/"
