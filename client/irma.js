@@ -494,7 +494,7 @@ function handleStatusMessageClientConnected(msg) {
             else if (action == Action.Issuing)
                 finishIssuance();
             else if (action == Action.Signing)
-                finishVerification();
+                finishSigning();
             break;
         default:
             failure("unknown status message in Connected state", msg);
@@ -510,6 +510,13 @@ function finishIssuance() {
 function finishVerification() {
     var xhr = new XMLHttpRequest();
     xhr.open('GET', encodeURI( actionPath + sessionId + "/getproof"));
+    xhr.onload = function () { handleProofMessageFromServer(xhr); };
+    xhr.send();
+}
+
+function finishSigning() {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', encodeURI( actionPath + sessionId + "/getsignature"));
     xhr.onload = function () { handleProofMessageFromServer(xhr); };
     xhr.send();
 }
@@ -588,7 +595,7 @@ function createJWT(request, requesttype, subject, issuer) {
     console.log("Creating unsigned JWT!!!");
     var header = {
         alg: "none",
-        typ: "JWT"
+        type: "JWT"
     };
 
     var payload = {
@@ -616,6 +623,9 @@ function createUnsignedVerificationJWT(sprequest) {
     return createJWT(sprequest, "sprequest", "verification_request", "testsp");
 }
 
+function createUnsignedSignatureJWT(absrequest) {
+    return createJWT(absrequest, "absrequest", "signature_request", "testsig");
+}
 
 // Initialize
 getSetupFromMetas();
@@ -629,5 +639,6 @@ export {
     info,
     createUnsignedJWT, // just calls createUnsignedIssuanceJWT for backwards compatibility
     createUnsignedIssuanceJWT,
-    createUnsignedVerificationJWT
+    createUnsignedVerificationJWT,
+    createUnsignedSignatureJWT
 };
