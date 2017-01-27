@@ -165,23 +165,19 @@ var sigrequest = {
         "content": [
             {
                 "label": "over12",
-                "condition" : "a global condition",
                 "attributes": [ "irma-demo.MijnOverheid.ageLower.over12" ],
-                "conditions" : [ { "irma-demo.MijnOverheid.ageLower.over12" : "yes" } ]
             },
         ]
     }
 };
 ```
 
-`messageType` must be "STRING", and `message` contains the message you want to sign. The optional `condition` tag contains the global condition, that must hold for all attributes in this label, where the `conditions' tag contains attribute-specific conditions. Local conditions override the global condition: in the above example, it is required to have the value 'yes' for the `over12` attribute.
-
-Next, call `IRMA.sign` when you want to obtain the signature from the client:
+`messageType` must be "STRING", and `message` contains the message you want to sign and content contains the attributes that are used and included in the signature. Next, call `IRMA.sign` when you want to obtain the signature from the client:
 
 ```javascript
 IRMA.sign(sprequest, success, warning, error);
 ```
-This will start the protocol in the same way as in the verify case. Note that the web token that will be return in the `success` case contains the IRMA signature.
+This will start the protocol in the same way as in the verify case. Note that the web token that will be returned in the `success` case contains the IRMA signature.
 
 # Development
 
