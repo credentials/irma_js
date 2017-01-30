@@ -152,6 +152,33 @@ IRMA.issue(jwt, success, warning, error);
 
 For a full example, see `examples\issue` ([live demo](https://demo.irmacard.org/tomcat/irma_api_server/examples/issue.html)).
 
+## A simple IRMA signature
+
+IRMA signatures are almost the same as verification. We first need to create a JSON object with a signature request:
+
+```javascript
+var sigrequest = {
+    "validity": 60,
+    "request": {
+        "messageType" : "STRING",
+        "message" : "a test message",
+        "content": [
+            {
+                "label": "over12",
+                "attributes": [ "irma-demo.MijnOverheid.ageLower.over12" ],
+            },
+        ]
+    }
+};
+```
+
+`messageType` must be "STRING", and `message` contains the message you want to sign and content contains the attributes that are used and included in the signature. Next, call `IRMA.sign` when you want to obtain the signature from the client:
+
+```javascript
+IRMA.sign(sprequest, success, warning, error);
+```
+This will start the protocol in the same way as in the verify case. Note that the web token that will be returned in the `success` case contains the IRMA signature.
+
 # Development
 
 Some notes on development

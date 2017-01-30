@@ -32,7 +32,8 @@ const StateMap = {
 
 const Action = {
     Verifying: Symbol(),
-    Issuing: Symbol()
+    Issuing: Symbol(),
+    Signing: Symbol()
 }
 
 var ua;
@@ -191,6 +192,14 @@ function verify(request, success_cb, cancel_cb, failure_cb) {
     doInitialRequest(jwt, 'text/plain', success_cb, cancel_cb, failure_cb);
 }
 
+function sign(signatureRequest, success_cb, cancel_cb, failure_cb) {
+    action = Action.Signing;
+    actionPath = apiServer + "signature/";
+    console.log("Action Path set to: ", actionPath);
+
+    doInitialRequest(signatureRequest, 'text/plain', success_cb, cancel_cb, failure_cb);
+}
+
 function doInitialRequest(request, contenttype, success_cb, cancel_cb, failure_cb) {
     // Check if there is an old unfinished session going on
     if (state !== State.Cancelled && state !== State.Timeout && state !== State.Done) {
@@ -231,7 +240,13 @@ function doInitialRequest(request, contenttype, success_cb, cancel_cb, failure_c
     if (ua === UserAgent.Desktop) {
         // Popup code
         console.log("Trying to open popup again");
-        var serverPage = (action == Action.Issuing) ? "issue.html" : "verify.html";
+        var serverPage;
+        if (action == Action.Issuing) 
+            serverPage = "issue.html"
+        else if (action == Action.Verifying)
+            serverPage = "verify.html";
+        else
+            serverPage = "sign.html";
         popup = window.open(webServer + serverPage, 'name','height=400,width=640');
         if (window.focus) {
             popup.focus();
@@ -477,6 +492,8 @@ function handleStatusMessageClientConnected(msg) {
                 finishVerification();
             else if (action == Action.Issuing)
                 finishIssuance();
+            else if (action == Action.Signing)
+                finishSigning();
             break;
         default:
             failure("unknown status message in Connected state", msg);
@@ -492,6 +509,13 @@ function finishIssuance() {
 function finishVerification() {
     var xhr = new XMLHttpRequest();
     xhr.open('GET', encodeURI( actionPath + sessionId + "/getproof"));
+    xhr.onload = function () { handleProofMessageFromServer(xhr); };
+    xhr.send();
+}
+
+function finishSigning() {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', encodeURI( actionPath + sessionId + "/getsignature"));
     xhr.onload = function () { handleProofMessageFromServer(xhr); };
     xhr.send();
 }
@@ -598,6 +622,9 @@ function createUnsignedVerificationJWT(sprequest) {
     return createJWT(sprequest, "sprequest", "verification_request", "testsp");
 }
 
+function createUnsignedSignatureJWT(absrequest) {
+    return createJWT(absrequest, "absrequest", "signature_request", "testsig");
+}
 
 // Initialize
 getSetupFromMetas();
@@ -605,10 +632,12 @@ detectUserAgent();
 window.addEventListener('message', handleMessage, false);
 
 export {
+    sign,
     verify,
     issue,
     info,
     createUnsignedJWT, // just calls createUnsignedIssuanceJWT for backwards compatibility
     createUnsignedIssuanceJWT,
-    createUnsignedVerificationJWT
+    createUnsignedVerificationJWT,
+    createUnsignedSignatureJWT
 };
