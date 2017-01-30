@@ -197,8 +197,7 @@ function sign(signatureRequest, success_cb, cancel_cb, failure_cb) {
     actionPath = apiServer + "signature/";
     console.log("Action Path set to: ", actionPath);
 
-    doInitialRequest(JSON.stringify(signatureRequest), 'application/json',
-            success_cb, cancel_cb, failure_cb);
+    doInitialRequest(signatureRequest, 'text/plain', success_cb, cancel_cb, failure_cb);
 }
 
 function doInitialRequest(request, contenttype, success_cb, cancel_cb, failure_cb) {
@@ -595,7 +594,7 @@ function createJWT(request, requesttype, subject, issuer) {
     console.log("Creating unsigned JWT!!!");
     var header = {
         alg: "none",
-        type: "JWT"
+        typ: "JWT"
     };
 
     var payload = {
