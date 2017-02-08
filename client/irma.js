@@ -241,7 +241,7 @@ function doInitialRequest(request, contenttype, success_cb, cancel_cb, failure_c
         // Popup code
         console.log("Trying to open popup again");
         var serverPage;
-        if (action == Action.Issuing) 
+        if (action == Action.Issuing)
             serverPage = "issue.html"
         else if (action == Action.Verifying)
             serverPage = "verify.html";
@@ -623,7 +623,7 @@ function createUnsignedVerificationJWT(sprequest) {
 }
 
 function createUnsignedSignatureJWT(absrequest) {
-    return createJWT(absrequest, "absrequest", "signature_request", "testsig");
+    return createJWT(absrequest, "absrequest", "signature_request", "testsigclient");
 }
 
 // Initialize
