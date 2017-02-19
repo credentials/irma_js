@@ -286,6 +286,7 @@ function handleInitialServerMessage(xhr, scounter) {
         console.log("Setting sessionPackage");
         sessionPackage = {
             v: sessionData.v,
+            vmax: sessionData.vmax,
             u: actionPath + sessionId
         };
         console.log("sessionPackage", sessionPackage);
