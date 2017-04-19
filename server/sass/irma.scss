@@ -79,8 +79,8 @@ p.error {
 }
 
 .irma_option_box {
-    width: 128;
-    height: 128;
+    width: 128px;
+    height: 128px;
 
     border-style: solid;
     border-width: medium;
@@ -109,4 +109,8 @@ p.error {
     border: 0px none;
 
     cursor: pointer;
+}
+
+#irma_text {
+    text-align: justify;
 }

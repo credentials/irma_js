@@ -247,7 +247,7 @@ function doInitialRequest(request, contenttype, success_cb, cancel_cb, failure_c
             serverPage = "verify.html";
         else
             serverPage = "sign.html";
-        popup = window.open(webServer + serverPage, 'name','height=400,width=640');
+        popup = window.open(webServer + serverPage, 'name','height=400,width=400');
         if (window.focus) {
             popup.focus();
         }
