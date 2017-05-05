@@ -1,4 +1,4 @@
-var jwt_decode = require('jwt-decode');
+var jwt_decode = require("jwt-decode");
 
 var webServer = "";
 var popup;
@@ -10,8 +10,8 @@ const State = {
     ClientConnected: Symbol(),
     Cancelled: Symbol(),
     Timeout: Symbol(),
-    Done: Symbol()
-}
+    Done: Symbol(),
+};
 var state = State.Done;
 
 // Extra state, this flag is set when we timeout locally but the
@@ -27,20 +27,20 @@ const StateMap = {
     [State.PopupReady]: "PopupReady",
     [State.Cancelled]: "Cancelled",
     [State.Timeout]: "Timeout",
-    [State.Done]: "Done"
-}
+    [State.Done]: "Done",
+};
 
 const Action = {
     Verifying: Symbol(),
     Issuing: Symbol(),
-    Signing: Symbol()
-}
+    Signing: Symbol(),
+};
 
 var ua;
 const UserAgent = {
     Desktop: Symbol(),
     Android: Symbol(),
-}
+};
 
 var sessionPackage;
 var sessionRequest;
@@ -73,7 +73,7 @@ function failure(msg, ...data) {
     closePopup();
     cancelTimers();
 
-    if(typeof(failureCallback) !== "undefined") {
+    if (typeof(failureCallback) !== "undefined") {
         failureCallback(msg, ...data);
     }
 }
@@ -81,19 +81,19 @@ function failure(msg, ...data) {
 function getSetupFromMetas() {
     console.log("Running getSetupFromMetas");
     var metas = document.getElementsByTagName("meta");
-    for(var i = 0; i < metas.length; i++) {
+    for (var i = 0; i < metas.length; i++) {
         var meta_name = metas[i].getAttribute("name");
-        if (meta_name == null) {
+        if (meta_name === null) {
             continue;
         }
 
         meta_name = meta_name.toLowerCase();
         console.log("Examining meta: ", meta_name);
-        if(meta_name === "irma-web-server") {
+        if (meta_name === "irma-web-server") {
             webServer = metas[i].getAttribute("value");
             console.log("VerificationServer set to", webServer);
         }
-        if(meta_name === "irma-api-server") {
+        if (meta_name === "irma-api-server") {
             apiServer = metas[i].getAttribute("value");
             console.log("API server set to", apiServer);
         }
@@ -102,7 +102,7 @@ function getSetupFromMetas() {
 
 /* TODO: Incomplete user agent detection */
 function detectUserAgent() {
-    if( /Android/i.test(navigator.userAgent) ) {
+    if ( /Android/i.test(navigator.userAgent) ) {
         console.log("Detected Android");
         ua = UserAgent.Android;
     } else {
@@ -112,21 +112,21 @@ function detectUserAgent() {
 }
 
 function handleMessage(event) {
-    var msg = event.data
+    var msg = event.data;
     console.log("Received message: ", msg);
     console.log("State", StateMap[state]);
 
     // If server page is ready, the server page
     // was reloaded, reset state machine to Initialized
-    switch(msg.type) {
+    switch (msg.type) {
         case "serverPageReady":
-            if (state == State.Done || state == State.Cancelled) {
+            if (state === State.Done || state === State.Cancelled) {
                 console.log("Closing popup");
                 closePopup();
                 return;
             }
 
-            if (state == State.SessionStarted) {
+            if (state === State.SessionStarted) {
                 sendSessionToPopup();
             } else {
                 // Apparently session data is slow to come in
@@ -138,7 +138,7 @@ function handleMessage(event) {
 
             // Inform the server too
             var xhr = new XMLHttpRequest();
-            xhr.open('DELETE', encodeURI( actionPath + sessionId ));
+            xhr.open("DELETE", encodeURI( actionPath + sessionId ));
             xhr.onload = function () {};
             xhr.send();
 
@@ -152,12 +152,12 @@ function handleMessage(event) {
 function sendSessionToPopup() {
     sendMessageToPopup({
         type: "tokenData",
-        message: sessionPackage
+        message: sessionPackage,
     });
 }
 
 function sendMessageToPopup(data) {
-    if(typeof(popup) !== "undefined") {
+    if (typeof(popup) !== "undefined") {
         popup.postMessage(data, "*");
         console.log("Sent message to popup: " + JSON.stringify(data));
     }
@@ -167,29 +167,30 @@ function issue(jwt, success_cb, cancel_cb, failure_cb) {
     action = Action.Issuing;
     actionPath = apiServer + "issue/";
 
-    doInitialRequest(jwt, 'text/plain', success_cb, cancel_cb, failure_cb);
+    doInitialRequest(jwt, "text/plain", success_cb, cancel_cb, failure_cb);
 }
 
 
 function verify(request, success_cb, cancel_cb, failure_cb) {
     // Also support bare (i.e., non-JWT) service provider requests for backwards compatibility
     // We assume that the user meant to create an unsigned JWT.
-    if (typeof request == "object") {
+    var jwt;
+    if (typeof request === "object") {
         console.log("WARNING: calling IRMA.verify with a bare service provider request "
             + "is deprecated, you should pass a JWT instead. For now your request will be "
             + "converted to an unsigned JWT, but you should consider doing this yourself "
             + "(e.g. using IRMA.createUnsignedVerificationJWT).");
-        var jwt = createUnsignedVerificationJWT(request);
+        jwt = createUnsignedVerificationJWT(request);
     } else {
         // Assume it is a JWT and let the API server figure out if it is valid
-        var jwt = request;
+        jwt = request;
     }
 
     action = Action.Verifying;
     actionPath = apiServer + "verification/";
     console.log("Action Path set to: ", actionPath);
 
-    doInitialRequest(jwt, 'text/plain', success_cb, cancel_cb, failure_cb);
+    doInitialRequest(jwt, "text/plain", success_cb, cancel_cb, failure_cb);
 }
 
 function sign(signatureRequest, success_cb, cancel_cb, failure_cb) {
@@ -197,7 +198,7 @@ function sign(signatureRequest, success_cb, cancel_cb, failure_cb) {
     actionPath = apiServer + "signature/";
     console.log("Action Path set to: ", actionPath);
 
-    doInitialRequest(signatureRequest, 'text/plain', success_cb, cancel_cb, failure_cb);
+    doInitialRequest(signatureRequest, "text/plain", success_cb, cancel_cb, failure_cb);
 }
 
 function doInitialRequest(request, contenttype, success_cb, cancel_cb, failure_cb) {
@@ -241,28 +242,28 @@ function doInitialRequest(request, contenttype, success_cb, cancel_cb, failure_c
         // Popup code
         console.log("Trying to open popup again");
         var serverPage;
-        if (action == Action.Issuing)
-            serverPage = "issue.html"
-        else if (action == Action.Verifying)
+        if (action === Action.Issuing)
+            serverPage = "issue.html";
+        else if (action === Action.Verifying)
             serverPage = "verify.html";
         else
             serverPage = "sign.html";
-        popup = window.open(webServer + serverPage, 'name','height=410,width=440');
+        popup = window.open(webServer + serverPage, "name", "height=410,width=440");
         if (window.focus) {
             popup.focus();
         }
     }
 
     var xhr = new XMLHttpRequest();
-    xhr.open('POST', encodeURI(actionPath));
-    xhr.setRequestHeader('Content-Type', contenttype);
+    xhr.open("POST", encodeURI(actionPath));
+    xhr.setRequestHeader("Content-Type", contenttype);
     var currentSessionCounter = sessionCounter;
-    xhr.onload = function() { handleInitialServerMessage(xhr, currentSessionCounter) };
+    xhr.onload = function() { handleInitialServerMessage(xhr, currentSessionCounter); };
     xhr.send(request);
-};
+}
 
 function handleInitialServerMessage(xhr, scounter) {
-    if (scounter != sessionCounter) {
+    if (scounter !== sessionCounter) {
         console.log("Intervering result from old session, ignoring!!!");
         return;
     }
@@ -287,7 +288,7 @@ function handleInitialServerMessage(xhr, scounter) {
         sessionPackage = {
             v: sessionData.v,
             vmax: sessionData.vmax,
-            u: actionPath + sessionId
+            u: actionPath + sessionId,
         };
         console.log("sessionPackage", sessionPackage);
 
@@ -296,7 +297,7 @@ function handleInitialServerMessage(xhr, scounter) {
         setupTimeoutMonitoring();
         connectClientToken();
 
-        if (state == State.PopupReady) {
+        if (state === State.PopupReady) {
             // Popup was already ready, send session data now
             console.log("Sending delayed popup");
             sendSessionToPopup();
@@ -323,7 +324,7 @@ function setupFallbackMonitoring() {
     var status_url = actionPath + sessionId + "/status";
 
     var checkVerificationStatus = function () {
-        if ( state == State.Done || state == State.Cancelled ) {
+        if ( state === State.Done || state === State.Cancelled ) {
             clearTimeout(fallbackTimer);
             return;
         }
@@ -332,11 +333,11 @@ function setupFallbackMonitoring() {
              statusWebsocket.readyState !== 1 ) {
             // Status WebSocket is not active, check using polling
             var xhr = new XMLHttpRequest();
-            xhr.open('GET', encodeURI(status_url));
-            xhr.onload = function () { handleFallbackStatusUpdate (xhr); };
+            xhr.open("GET", encodeURI(status_url));
+            xhr.onload = function () { handleFallbackStatusUpdate(xhr); };
             xhr.send();
         }
-    }
+    };
 
     fallbackTimer = setInterval(checkVerificationStatus, STATUS_CHECK_INTERVAL);
 }
@@ -359,7 +360,7 @@ function setupTimeoutMonitoring() {
             // We should timeout shortly, setting state reflect this
             sessionTimedOut = true;
         }
-    }
+    };
 
     var timeout = DEFAULT_TIMEOUT;
     if (sessionRequest.timeout > 0) {
@@ -374,10 +375,10 @@ function setupTimeoutMonitoring() {
  * messages will be repeatedly processed by this function.
  */
 function handleFallbackStatusUpdate(xhr) {
-    if(xhr.status === 200) {
+    if (xhr.status === 200) {
         // Success
         var data = xhr.responseText;
-        switch(data) {
+        switch (data) {
             case "\"INITIALIZED\"":
                 // No need to do anything
                 break;
@@ -391,12 +392,12 @@ function handleFallbackStatusUpdate(xhr) {
                 cancelSession();
                 break;
             default:
-                console.log("Got unexpected state in poll: ", data)
+                console.log("Got unexpected state in poll: ", data);
                 break;
         }
     } else {
         // Ignore all errors when already done
-        if ( state == State.Done || state == State.Cancelled ) {
+        if ( state === State.Done || state === State.Cancelled ) {
             return;
         }
 
@@ -418,9 +419,6 @@ function cancelTimers () {
     if (typeof(timeoutTimer) !== "undefined") {
         clearTimeout(timeoutTimer);
     }
-    if (typeof(checkTimeoutMonitor) !== "undefined") {
-        clearTimeout(checkTimeoutMonitor);
-    }
 }
 
 function connectClientToken() {
@@ -430,16 +428,16 @@ function connectClientToken() {
     if (ua === UserAgent.Android) {
         // Android code
         // TODO: handle URL more nicely
-        var newUrl =  "intent://#Intent;package=org.irmacard.cardemu;scheme=cardemu;"
+        var newUrl = "intent://#Intent;package=org.irmacard.cardemu;scheme=cardemu;"
             + "l.timestamp=" + Date.now() + ";"
             + "S.qr=" + encodeURIComponent(JSON.stringify(sessionPackage)) + ";"
-            + "S.browser_fallback_url=http%3A%2F%2Fapp.irmacard.org%2Fverify;end"
+            + "S.browser_fallback_url=http%3A%2F%2Fapp.irmacard.org%2Fverify;end";
         window.location.href = newUrl;
     }
 }
 
 function receiveStatusMessage(data) {
-    var msg = data.data
+    var msg = data.data;
 
     if (msg === "CANCELLED") {
         cancelSession();
@@ -452,7 +450,7 @@ function receiveStatusMessage(data) {
         return;
     }
 
-    switch(state) {
+    switch (state) {
         case State.SessionStarted:
             handleStatusMessageSessionStarted(msg);
             break;
@@ -466,12 +464,12 @@ function receiveStatusMessage(data) {
 }
 
 function handleStatusMessageSessionStarted(msg) {
-    switch(msg) {
+    switch (msg) {
         case "CONNECTED":
             if (state === State.SessionStarted) {
                 console.log("Client device has connected with the server");
                 state = State.ClientConnected;
-                sendMessageToPopup({type: "clientConnected"});
+                sendMessageToPopup({ type: "clientConnected" });
             }
             break;
         default:
@@ -481,7 +479,7 @@ function handleStatusMessageSessionStarted(msg) {
 }
 
 function handleStatusMessageClientConnected(msg) {
-    switch(msg) {
+    switch (msg) {
         case "DONE":
             console.log("Server returned DONE");
 
@@ -489,11 +487,11 @@ function handleStatusMessageClientConnected(msg) {
             closePopup();
             closeWebsocket();
 
-            if (action == Action.Verifying)
+            if (action === Action.Verifying)
                 finishVerification();
-            else if (action == Action.Issuing)
+            else if (action === Action.Issuing)
                 finishIssuance();
-            else if (action == Action.Signing)
+            else if (action === Action.Signing)
                 finishSigning();
             break;
         default:
@@ -509,25 +507,25 @@ function finishIssuance() {
 
 function finishVerification() {
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', encodeURI( actionPath + sessionId + "/getproof"));
+    xhr.open("GET", encodeURI( actionPath + sessionId + "/getproof"));
     xhr.onload = function () { handleProofMessageFromServer(xhr); };
     xhr.send();
 }
 
 function finishSigning() {
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', encodeURI( actionPath + sessionId + "/getsignature"));
+    xhr.open("GET", encodeURI( actionPath + sessionId + "/getsignature"));
     xhr.onload = function () { handleProofMessageFromServer(xhr); };
     xhr.send();
 }
 
 function closePopup() {
     if (ua !== UserAgent.Android) {
-        sendMessageToPopup({type: "done"});
+        sendMessageToPopup({ type: "done" });
     }
 }
 
-function cancelSession(cancelOld=false) {
+function cancelSession(cancelOld = false) {
     console.log("Token cancelled authentication", cancelOld);
     state = State.Cancelled;
 
@@ -558,7 +556,7 @@ function timeoutSession() {
 
 
 function handleProofMessageFromServer(xhr) {
-    if(xhr.status === 200) {
+    if (xhr.status === 200) {
         // Success
         var data = xhr.responseText;
         console.log("Proof data: ", data);
@@ -582,11 +580,11 @@ function base64url(src) {
     var res = btoa(src);
 
     // Remove padding characters
-    res = res.replace(/=+$/, '');
+    res = res.replace(/=+$/, "");
 
     // Replace non-url characters
-    res = res.replace(/\+/g, '-');
-    res = res.replace(/\//g, '_');
+    res = res.replace(/\+/g, "-");
+    res = res.replace(/\//g, "_");
 
     return res;
 }
@@ -595,7 +593,7 @@ function createJWT(request, requesttype, subject, issuer) {
     console.log("Creating unsigned JWT!!!");
     var header = {
         alg: "none",
-        typ: "JWT"
+        typ: "JWT",
     };
 
     var payload = {
@@ -630,7 +628,7 @@ function createUnsignedSignatureJWT(absrequest) {
 // Initialize
 getSetupFromMetas();
 detectUserAgent();
-window.addEventListener('message', handleMessage, false);
+window.addEventListener("message", handleMessage, false);
 
 export {
     sign,
@@ -640,5 +638,5 @@ export {
     createUnsignedJWT, // just calls createUnsignedIssuanceJWT for backwards compatibility
     createUnsignedIssuanceJWT,
     createUnsignedVerificationJWT,
-    createUnsignedSignatureJWT
+    createUnsignedSignatureJWT,
 };

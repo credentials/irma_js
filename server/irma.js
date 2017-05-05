@@ -1,8 +1,8 @@
 function handleMessage(event) {
-    var msg = event.data
+    var msg = event.data;
     console.log("Received message: ", msg);
 
-    switch(msg.type) {
+    switch (msg.type) {
         case "tokenData":
             console.log("Got only a QR code");
             $("#qrcode").qrcode({
@@ -33,7 +33,7 @@ function sendMessage(data){
 function failure() {
     console.log("ERROR: ", arguments);
 
-    if(arguments.length > 0) {
+    if (arguments.length > 0) {
         $(".irma_title").html("ERROR");
         showMessage("<b>Error: <b> " + arguments[0]);
         $("#irma_text").add_class("error");
@@ -50,14 +50,14 @@ $("#help_button").on("click", function() {
 
 $("#cancel_button").on("click", function() {
     sendMessage({
-        type: "userCancelled"
+        type: "userCancelled",
     });
     window.close();
 });
 
-window.addEventListener('message', handleMessage, false);
+window.addEventListener("message", handleMessage, false);
 sendMessage({
-    type: "serverPageReady"
+    type: "serverPageReady",
 });
 
 console.log("Server module loaded");
