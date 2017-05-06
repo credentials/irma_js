@@ -26,7 +26,7 @@ function handleMessage(event) {
 }
 
 function sendMessage(data){
-    window.opener.postMessage(data, "*");
+    window.top.postMessage(data, "*");
     console.log("Sent message: " + JSON.stringify(data));
 }
 
@@ -55,7 +55,9 @@ $("#cancel_button").on("click", function() {
     window.close();
 });
 
+window.onmessage = handleMessage;
 window.addEventListener("message", handleMessage, false);
+
 sendMessage({
     type: "serverPageReady",
 });

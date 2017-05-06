@@ -158,7 +158,7 @@ function sendSessionToPopup() {
 
 function sendMessageToPopup(data) {
     if (typeof(popup) !== "undefined") {
-        popup.postMessage(data, "*");
+        popup[0].contentWindow.postMessage(data, "*");
         console.log("Sent message to popup: " + JSON.stringify(data));
     }
 }
@@ -248,10 +248,26 @@ function doInitialRequest(request, contenttype, success_cb, cancel_cb, failure_c
             serverPage = "verify.html";
         else
             serverPage = "sign.html";
-        popup = window.open(webServer + serverPage, "name", "height=410,width=440");
-        if (window.focus) {
-            popup.focus();
-        }
+
+        $("<div id='myModal' class='modal fade' tabindex='-1' role='dialog' aria-hidden='true'>"
+        + "<div class='modal-dialog'><div class='modal-content'><div class='modal-body'>"
+        + "<iframe width='440' height='410' frameborder='0' allowfullscreen=''></iframe>"
+        + "</div></div></div></div>")
+        .appendTo("body");
+
+        popup = $("iframe");
+        popup.attr("src", webServer + serverPage);
+
+        $(".modal-content, iframe, .modal-content div").css({
+            width: "440px",
+            height: "440px",
+            margin: "0",
+            padding: "0",
+        });
+        $(".modal-content").css({
+            margin: "0 auto",
+        });
+        $("#myModal").modal({});
     }
 
     var xhr = new XMLHttpRequest();

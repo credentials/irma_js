@@ -83,8 +83,8 @@
     "react/no-find-dom-node": "off",
     "no-console": "off",
 
-    // Below is the eslint recommended configuration as off February 7, 2017
-    // It can be included via "extends", but is left here for easy reference and modification
+    # Below is the eslint recommended configuration as off February 7, 2017
+    # It can be included via "extends", but is left here for easy reference and modification
     "accessor-pairs": "off",
     "array-bracket-spacing": "off",
     "array-callback-return": "off",
