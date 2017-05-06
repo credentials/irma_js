@@ -253,7 +253,7 @@ function doInitialRequest(request, contenttype, success_cb, cancel_cb, failure_c
         $("#server-modal").remove();
         $("<div id='server-modal' class='modal fade' tabindex='-1' role='dialog' aria-hidden='true'>"
         + "<div class='modal-dialog'><div class='modal-content'><div class='modal-body'>"
-        + "<iframe width='440' height='410' frameborder='0' allowfullscreen=''></iframe>"
+        + "<iframe frameborder='0' allowfullscreen=''></iframe>"
         + "</div></div></div></div>")
         .appendTo("body");
 
@@ -261,8 +261,8 @@ function doInitialRequest(request, contenttype, success_cb, cancel_cb, failure_c
         $("iframe").attr("src", webServer + serverPage);
 
         $(".modal-content, iframe, .modal-content div").css({
-            "width": "440px",
-            "height": "430px",
+            "width": "455px",
+            "height": "570px",
             "margin": "0",
             "padding": "0",
         });

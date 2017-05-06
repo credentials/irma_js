@@ -34,9 +34,9 @@ p.error {
     border-style: solid;
     border-width: 0px;
     border-color: $irma-background-color;
-    @include border-radius(12px);
+    @include border-radius(5px);
 
-    padding: 20px 10px 10px 140px;
+    padding: 20px;
 
     font-weight: 200;
 
@@ -44,7 +44,7 @@ p.error {
 }
 
 .irma_button_box {
-    width: $irma-width + 150px;
+    width: $irma-width + 40px;
     padding-top: 5px;
     margin-left: $irma-margin;
     margin-top: -$irma-margin;
@@ -74,13 +74,12 @@ p.error {
 
 .irma_option_container {
     text-align: center;
-    margin-left: auto;
-    margin-right: auto;
+    margin: 30px auto;
 }
 
 .irma_option_box {
-    width: 128px;
-    height: 128px;
+    width: 230px;
+    height: 230px;
 
     border-style: solid;
     border-width: medium;
@@ -105,7 +104,7 @@ p.error {
 
     background-color: $irma-dark-gray;
 
-    @include border-radius(12px);
+    @include border-radius(5px);
     border: 0px none;
 
     cursor: pointer;
@@ -113,4 +112,5 @@ p.error {
 
 #irma_text {
     text-align: justify;
+    padding-left: 125px;
 }

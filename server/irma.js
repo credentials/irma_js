@@ -7,7 +7,7 @@ function handleMessage(event) {
             console.log("Got a QR code");
             $("#qrcode").empty().qrcode({
                 text: JSON.stringify(msg.message),
-                size: 128,
+                size: 230,
             });
             $("#spinner").hide();
             $(".irma_option_container").show();
