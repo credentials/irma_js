@@ -15,5 +15,8 @@
     "grunt-sass": "^1.1.0",
     "grunt-string-replace": "^1.2.0",
     "jwt-decode": "^1.5.1"
+  },
+  "dependencies": {
+    "babel-polyfill": "^6.23.0"
   }
 }
