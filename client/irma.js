@@ -1,7 +1,6 @@
 var jwt_decode = require("jwt-decode");
 
 var webServer = "";
-var popup;
 
 const State = {
     Initialized: Symbol(),
@@ -127,6 +126,7 @@ function handleMessage(event) {
             }
 
             if (state === State.SessionStarted) {
+                console.log("Sending session to popup in handleMessage()");
                 sendSessionToPopup();
             } else {
                 // Apparently session data is slow to come in
@@ -157,9 +157,9 @@ function sendSessionToPopup() {
 }
 
 function sendMessageToPopup(data) {
-    if (typeof(popup) !== "undefined") {
-        popup[0].contentWindow.postMessage(data, "*");
-        console.log("Sent message to popup: " + JSON.stringify(data));
+    if ($("iframe").length) {
+        console.log("Sending message to popup: " + JSON.stringify(data));
+        $("iframe")[0].contentWindow.postMessage(data, "*");
     }
 }
 
@@ -240,7 +240,7 @@ function doInitialRequest(request, contenttype, success_cb, cancel_cb, failure_c
 
     if (ua === UserAgent.Desktop) {
         // Popup code
-        console.log("Trying to open popup again");
+        console.log("Trying to open popup");
         var serverPage;
         if (action === Action.Issuing)
             serverPage = "issue.html";
@@ -249,25 +249,30 @@ function doInitialRequest(request, contenttype, success_cb, cancel_cb, failure_c
         else
             serverPage = "sign.html";
 
-        $("<div id='myModal' class='modal fade' tabindex='-1' role='dialog' aria-hidden='true'>"
+        // Add modal iframe, removing any previous ones first
+        $("#server-modal").remove();
+        $("<div id='server-modal' class='modal fade' tabindex='-1' role='dialog' aria-hidden='true'>"
         + "<div class='modal-dialog'><div class='modal-content'><div class='modal-body'>"
         + "<iframe width='440' height='410' frameborder='0' allowfullscreen=''></iframe>"
         + "</div></div></div></div>")
         .appendTo("body");
 
-        popup = $("iframe");
-        popup.attr("src", webServer + serverPage);
+        // Start loading the iframe's content
+        $("iframe").attr("src", webServer + serverPage);
 
         $(".modal-content, iframe, .modal-content div").css({
-            width: "440px",
-            height: "440px",
-            margin: "0",
-            padding: "0",
+            "width": "440px",
+            "height": "430px",
+            "margin": "0",
+            "padding": "0",
         });
         $(".modal-content").css({
-            margin: "0 auto",
+            "margin": "0 auto",
+            "border-radius": "0",
         });
-        $("#myModal").modal({});
+
+        // Show the modal
+        $("#server-modal").modal({});
     }
 
     var xhr = new XMLHttpRequest();
@@ -537,7 +542,8 @@ function finishSigning() {
 
 function closePopup() {
     if (ua !== UserAgent.Android) {
-        sendMessageToPopup({ type: "done" });
+        console.log("Closing popup");
+        $("#server-modal").modal("hide");
     }
 }
 

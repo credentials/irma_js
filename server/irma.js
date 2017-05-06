@@ -4,8 +4,8 @@ function handleMessage(event) {
 
     switch (msg.type) {
         case "tokenData":
-            console.log("Got only a QR code");
-            $("#qrcode").qrcode({
+            console.log("Got a QR code");
+            $("#qrcode").empty().qrcode({
                 text: JSON.stringify(msg.message),
                 size: 128,
             });
@@ -20,7 +20,7 @@ function handleMessage(event) {
             window.close();
             break;
         default:
-            failure("ERROR: unknown message:", msg);
+            failure("Received unknown message: \"" + msg + "\"");
             break;
     }
 }
@@ -52,10 +52,8 @@ $("#cancel_button").on("click", function() {
     sendMessage({
         type: "userCancelled",
     });
-    window.close();
 });
 
-window.onmessage = handleMessage;
 window.addEventListener("message", handleMessage, false);
 
 sendMessage({
