@@ -2,7 +2,7 @@
   "name": "irma_js",
   "version": "0.0.1",
   "description": "Client and server javascript for IRMA",
-  "author": "Wouter Lueks, Radboud University",
+  "author": "Wouter Lueks, Sietse Ringers, Privacy by Design Foundation",
   "license": "BSD-3-Clause",
   "devDependencies": {
     "babel-preset-es2015": "^6.1.4",

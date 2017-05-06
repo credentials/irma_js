@@ -4,7 +4,8 @@
   "main": "",
   "authors": [
     "Wouter Lueks",
-    "Radboud University"
+    "Sietse Ringers",
+    "Privacy by Design Foundation"
   ],
   "license": "BSD-3-Clause",
   "moduleType": [
