@@ -44,6 +44,13 @@ module.exports = function (grunt) {
                 },
             },
         },
+        uglify: {
+            client: {
+                files: {
+                    "./build/client/irma.min.js": ["./build/client/irma.js"],
+                },
+            },
+        },
         sass: {
             options: {
                 sourcemap: false,
@@ -137,7 +144,8 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks("grunt-contrib-watch");
     grunt.loadNpmTasks("grunt-contrib-copy");
     grunt.loadNpmTasks("grunt-string-replace");
+    grunt.loadNpmTasks("grunt-contrib-uglify");
 
     grunt.registerTask("default", ["string-replace", "watch"]);
-    grunt.registerTask("build", ["browserify", "sass", "copy", "string-replace"]);
+    grunt.registerTask("build", ["browserify", "sass", "uglify", "copy", "string-replace"]);
 };
