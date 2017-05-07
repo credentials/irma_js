@@ -154,13 +154,28 @@ function sendMessageToPopup(data) {
     }
 }
 
+function doSessionFromQr(qr, success_cb, cancel_cb, failure_cb) {
+    clearState();
+    showPopup();
+    setAndCheckCallbacks(success_cb, cancel_cb, failure_cb);
+
+    actionPath = qr.u.substr(0, qr.u.lastIndexOf("/")) + "/";            // Strip session token
+    apiServer = actionPath.substr(0, actionPath.lastIndexOf("/")) + "/"; // Also strip session type (e.g., "issue")
+    sessionId = qr.u.substr(qr.u.lastIndexOf("/") + 1, qr.u.length);
+    sessionPackage = qr;
+    startSession();
+}
+
 function issue(jwt, success_cb, cancel_cb, failure_cb) {
     action = Action.Issuing;
     actionPath = apiServer + "issue/";
-
     doInitialRequest(jwt, success_cb, cancel_cb, failure_cb);
 }
 
+function issueFromQr(qr, success_cb, cancel_cb, failure_cb) {
+    action = Action.Issuing;
+    doSessionFromQr(qr, success_cb, cancel_cb, failure_cb);
+}
 
 function verify(request, success_cb, cancel_cb, failure_cb) {
     // Also support bare (i.e., non-JWT) service provider requests for backwards compatibility
@@ -179,17 +194,23 @@ function verify(request, success_cb, cancel_cb, failure_cb) {
 
     action = Action.Verifying;
     actionPath = apiServer + "verification/";
-    console.log("Action Path set to: ", actionPath);
-
     doInitialRequest(jwt, success_cb, cancel_cb, failure_cb);
+}
+
+function verifyFromQr(qr, success_cb, cancel_cb, failure_cb) {
+    action = Action.Verifying;
+    doSessionFromQr(qr, success_cb, cancel_cb, failure_cb);
 }
 
 function sign(signatureRequest, success_cb, cancel_cb, failure_cb) {
     action = Action.Signing;
     actionPath = apiServer + "signature/";
-    console.log("Action Path set to: ", actionPath);
-
     doInitialRequest(signatureRequest, success_cb, cancel_cb, failure_cb);
+}
+
+function signFromQr(qr, success_cb, cancel_cb, failure_cb) {
+    action = Action.Signing;
+    doSessionFromQr(qr, success_cb, cancel_cb, failure_cb);
 }
 
 function clearState() {
@@ -656,6 +677,9 @@ export {
     verify,
     issue,
     info,
+    signFromQr,
+    verifyFromQr,
+    issueFromQr,
     createUnsignedJWT, // just calls createUnsignedIssuanceJWT for backwards compatibility
     createUnsignedIssuanceJWT,
     createUnsignedVerificationJWT,
