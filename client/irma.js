@@ -158,7 +158,7 @@ function issue(jwt, success_cb, cancel_cb, failure_cb) {
     action = Action.Issuing;
     actionPath = apiServer + "issue/";
 
-    doInitialRequest(jwt, "text/plain", success_cb, cancel_cb, failure_cb);
+    doInitialRequest(jwt, success_cb, cancel_cb, failure_cb);
 }
 
 
@@ -181,7 +181,7 @@ function verify(request, success_cb, cancel_cb, failure_cb) {
     actionPath = apiServer + "verification/";
     console.log("Action Path set to: ", actionPath);
 
-    doInitialRequest(jwt, "text/plain", success_cb, cancel_cb, failure_cb);
+    doInitialRequest(jwt, success_cb, cancel_cb, failure_cb);
 }
 
 function sign(signatureRequest, success_cb, cancel_cb, failure_cb) {
@@ -189,10 +189,10 @@ function sign(signatureRequest, success_cb, cancel_cb, failure_cb) {
     actionPath = apiServer + "signature/";
     console.log("Action Path set to: ", actionPath);
 
-    doInitialRequest(signatureRequest, "text/plain", success_cb, cancel_cb, failure_cb);
+    doInitialRequest(signatureRequest, success_cb, cancel_cb, failure_cb);
 }
 
-function doInitialRequest(request, contenttype, success_cb, cancel_cb, failure_cb) {
+function doInitialRequest(request, success_cb, cancel_cb, failure_cb) {
     // Check if there is an old unfinished session going on
     if (state !== State.Cancelled && state !== State.Timeout && state !== State.Done) {
         console.log("Found previously active session, cancelling that one first");
@@ -268,7 +268,7 @@ function doInitialRequest(request, contenttype, success_cb, cancel_cb, failure_c
 
     var xhr = new XMLHttpRequest();
     xhr.open("POST", encodeURI(actionPath));
-    xhr.setRequestHeader("Content-Type", contenttype);
+    xhr.setRequestHeader("Content-Type", "text/plain");
     var currentSessionCounter = sessionCounter;
     xhr.onload = function() { handleInitialServerMessage(xhr, currentSessionCounter); };
     xhr.send(request);
