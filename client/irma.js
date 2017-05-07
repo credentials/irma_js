@@ -286,7 +286,7 @@ function showPopup() {
         });
 
         // Show the modal
-        $("#server-modal").modal({});
+        $("#server-modal").modal({ backdrop: "static", keyboard: false });
     }
 }
 

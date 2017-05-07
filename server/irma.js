@@ -17,7 +17,6 @@ function handleMessage(event) {
             $(".irma_option_container").hide();
             break;
         case "done":
-            window.close();
             break;
         default:
             failure("Received unknown message: \"" + msg + "\"");
