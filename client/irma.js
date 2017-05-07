@@ -1,17 +1,16 @@
 var jwt_decode = require("jwt-decode");
 require("bootstrap");
-require("babel-polyfill");
 
 var webServer = "";
 
 const State = {
-    Initialized: Symbol(),
-    PopupReady: Symbol(),
-    SessionStarted: Symbol(),
-    ClientConnected: Symbol(),
-    Cancelled: Symbol(),
-    Timeout: Symbol(),
-    Done: Symbol(),
+    Initialized: "Initialized",
+    PopupReady: "PopupReady",
+    SessionStarted: "SessionStarted",
+    ClientConnected: "ClientConnected",
+    Cancelled: "Cancelled",
+    Timeout: "Timeout",
+    Done: "Done",
 };
 var state = State.Done;
 
@@ -21,26 +20,16 @@ var state = State.Done;
 // a timeout.
 var sessionTimedOut = false;
 
-const StateMap = {
-    [State.Initialized]: "Initialized",
-    [State.SessionStarted]: "SessionStarted",
-    [State.ClientConnected]: "ClientConnected",
-    [State.PopupReady]: "PopupReady",
-    [State.Cancelled]: "Cancelled",
-    [State.Timeout]: "Timeout",
-    [State.Done]: "Done",
-};
-
 const Action = {
-    Verifying: Symbol(),
-    Issuing: Symbol(),
-    Signing: Symbol(),
+    Verifying: "Verifying",
+    Issuing: "Issuing",
+    Signing: "Signing",
 };
 
 var ua;
 const UserAgent = {
-    Desktop: Symbol(),
-    Android: Symbol(),
+    Desktop: "Desktop",
+    Android: "Android",
 };
 
 var sessionPackage;
@@ -115,7 +104,7 @@ function detectUserAgent() {
 function handleMessage(event) {
     var msg = event.data;
     console.log("Received message: ", msg);
-    console.log("State", StateMap[state]);
+    console.log("State", state);
 
     // If server page is ready, the server page
     // was reloaded, reset state machine to Initialized
@@ -481,7 +470,7 @@ function receiveStatusMessage(data) {
             handleStatusMessageClientConnected(msg);
             break;
         default:
-            failure("ERROR: unknown current state", StateMap[state]);
+            failure("ERROR: unknown current state", state);
             break;
     }
 }
