@@ -148,9 +148,9 @@ function sendSessionToPopup() {
 }
 
 function sendMessageToPopup(data) {
-    if ($("iframe").length) {
+    if ($("#server-modal iframe").length) {
         console.log("Sending message to popup: " + JSON.stringify(data));
-        $("iframe")[0].contentWindow.postMessage(data, "*");
+        $("#server-modal iframe")[0].contentWindow.postMessage(data, "*");
     }
 }
 
@@ -251,9 +251,9 @@ function showPopup() {
         .appendTo("body");
 
         // Start loading the iframe's content
-        $("iframe").attr("src", webServer + serverPage);
+        $("#server-modal iframe").attr("src", webServer + serverPage);
 
-        $(".modal-content, iframe, .modal-content div").css({
+        $(".modal-content, .modal-content div, #server-modal iframe").css({
             "width": "455px",
             "height": "570px",
             "margin": "0",
