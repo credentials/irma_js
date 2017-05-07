@@ -202,9 +202,9 @@ to install the node dependencies and JavaScript libraries. Finally run
 
 to build the libraries and examples. See below for how to setup server URLs for a remote verification server or a local verification server. Alternatively, you can just run
 
-    grunt
+    grunt build watch
 
-to keep rebuilding the files as they change. (Make sure that you run `grunt build` at least once to make sure everything gets build, or just run `grunt build watch` to build and keep building.)
+to keep rebuilding the files as they change.
 
 ## URLs for api web pages and apis
 

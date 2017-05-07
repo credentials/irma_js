@@ -1,4 +1,5 @@
 var jwt_decode = require("jwt-decode");
+require("bootstrap");
 require("babel-polyfill");
 
 var webServer = "";
