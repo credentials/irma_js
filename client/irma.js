@@ -33,18 +33,18 @@ const UserAgent = {
 };
 
 var sessionPackage;
-var sessionRequest;
 var sessionCounter = 0;
 
 var successCallback;
 var cancelCallback;
 var failureCallback;
 
-var sessionData;
 var sessionId;
 var apiServer;
 var action;
 var actionPath;
+
+var statusWebsocket;
 
 const STATUS_CHECK_INTERVAL = 500;
 const DEFAULT_TIMEOUT = 120 * 1000;
@@ -192,7 +192,7 @@ function sign(signatureRequest, success_cb, cancel_cb, failure_cb) {
     doInitialRequest(signatureRequest, success_cb, cancel_cb, failure_cb);
 }
 
-function doInitialRequest(request, success_cb, cancel_cb, failure_cb) {
+function clearState() {
     // Check if there is an old unfinished session going on
     if (state !== State.Cancelled && state !== State.Timeout && state !== State.Done) {
         console.log("Found previously active session, cancelling that one first");
@@ -201,11 +201,11 @@ function doInitialRequest(request, success_cb, cancel_cb, failure_cb) {
 
     state = State.Initialized;
     sessionCounter++;
-
     sessionPackage = {};
-    sessionRequest = request;
     sessionTimedOut = false;
+}
 
+function setAndCheckCallbacks(success_cb, cancel_cb, failure_cb) {
     successCallback = success_cb;
     cancelCallback = cancel_cb;
     failureCallback = failure_cb;
@@ -228,7 +228,9 @@ function doInitialRequest(request, success_cb, cancel_cb, failure_cb) {
                     "irma.js will not notify error events!");
         failureCallback = function () {};
     }
+}
 
+function showPopup() {
     if (ua === UserAgent.Desktop) {
         // Popup code
         console.log("Trying to open popup");
@@ -265,6 +267,12 @@ function doInitialRequest(request, success_cb, cancel_cb, failure_cb) {
         // Show the modal
         $("#server-modal").modal({});
     }
+}
+
+function doInitialRequest(request, success_cb, cancel_cb, failure_cb) {
+    setAndCheckCallbacks(success_cb, cancel_cb, failure_cb);
+    clearState();
+    showPopup();
 
     var xhr = new XMLHttpRequest();
     xhr.open("POST", encodeURI(actionPath));
@@ -280,48 +288,53 @@ function handleInitialServerMessage(xhr, scounter) {
         return;
     }
 
-    if (xhr.status === 200) {
-        try {
-            sessionData = JSON.parse(xhr.responseText);
-        } catch (err) {
-            failure("Cannot parse server initial message: " + xhr.responseText, err);
-            return;
-        }
-
-        var sessionVersion = sessionData.v;
-        sessionId = sessionData.u;
-
-        if ( typeof(sessionVersion) === "undefined" || typeof(sessionId) === "undefined" ) {
-            failure("Field 'u' or 'v' missing in initial server message");
-            return;
-        }
-
-        console.log("Setting sessionPackage");
-        sessionPackage = {
-            v: sessionData.v,
-            vmax: sessionData.vmax,
-            u: actionPath + sessionId,
-        };
-        console.log("sessionPackage", sessionPackage);
-
-        setupClientMonitoring();
-        setupFallbackMonitoring();
-        setupTimeoutMonitoring();
-        connectClientToken();
-
-        if (state === State.PopupReady) {
-            // Popup was already ready, send session data now
-            console.log("Sending delayed popup");
-            sendSessionToPopup();
-        }
-        state = State.SessionStarted;
-    } else if (xhr.status !== 200) {
+    if (xhr.status !== 200) {
         var msg = "Initial call to server API failed. Returned status of " + xhr.status;
         failure(msg);
+        return;
     }
+
+    var sessionData;
+    try {
+        sessionData = JSON.parse(xhr.responseText);
+    } catch (err) {
+        failure("Cannot parse server initial message: " + xhr.responseText, err);
+        return;
+    }
+
+    var sessionVersion = sessionData.v;
+    sessionId = sessionData.u;
+
+    if ( typeof(sessionVersion) === "undefined" || typeof(sessionId) === "undefined" ) {
+        failure("Field 'u' or 'v' missing in initial server message");
+        return;
+    }
+
+    console.log("Setting sessionPackage");
+    sessionPackage = {
+        v: sessionData.v,
+        vmax: sessionData.vmax,
+        u: actionPath + sessionId,
+    };
+    console.log("sessionPackage", sessionPackage);
+
+    startSession();
 }
 
-var statusWebsocket;
+function startSession() {
+    setupClientMonitoring();
+    setupFallbackMonitoring();
+    setupTimeoutMonitoring();
+    connectClientToken();
+
+    if (state === State.PopupReady) {
+        // Popup was already ready, send session data now
+        console.log("Sending delayed popup");
+        sendSessionToPopup();
+    }
+    state = State.SessionStarted;
+}
+
 function setupClientMonitoring() {
     var url = apiServer.replace(/^http/, "ws") + "status/" + sessionId;
     statusWebsocket = new WebSocket(url);
@@ -374,12 +387,7 @@ function setupTimeoutMonitoring() {
         }
     };
 
-    var timeout = DEFAULT_TIMEOUT;
-    if (sessionRequest.timeout > 0) {
-        timeout = sessionRequest.timeout * 1000;
-    }
-
-    timeoutTimer = setTimeout(checkTimeoutMonitor, timeout);
+    timeoutTimer = setTimeout(checkTimeoutMonitor, DEFAULT_TIMEOUT);
 }
 
 /*
