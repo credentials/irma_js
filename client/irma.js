@@ -148,9 +148,9 @@ function sendSessionToPopup() {
 }
 
 function sendMessageToPopup(data) {
-    if ($("#server-modal iframe").length) {
+    if ($("#irma-server-modal iframe").length) {
         console.log("Sending message to popup: " + JSON.stringify(data));
-        $("#server-modal iframe")[0].contentWindow.postMessage(data, "*");
+        $("#irma-server-modal iframe")[0].contentWindow.postMessage(data, "*");
     }
 }
 
@@ -263,30 +263,34 @@ function showPopup() {
         else
             serverPage = "sign.html";
 
-        // Add modal iframe, removing any previous ones first
-        $("#server-modal").remove();
-        $("<div id='server-modal' class='modal fade' tabindex='-1' role='dialog' aria-hidden='true'>"
+        // Add modal iframe
+        $("<div id='irma-server-modal' class='modal fade' tabindex='-1' role='dialog' aria-hidden='true'>"
         + "<div class='modal-dialog'><div class='modal-content'><div class='modal-body'>"
         + "<iframe frameborder='0' allowfullscreen=''></iframe>"
         + "</div></div></div></div>")
-        .appendTo("body");
+            .appendTo("body");
 
-        // Start loading the iframe's content
-        $("#server-modal iframe").attr("src", webServer + serverPage);
+        // Might as well start loading the iframe's content already
+        $("#irma-server-modal iframe").attr("src", webServer + serverPage);
 
-        $(".modal-content, .modal-content div, #server-modal iframe").css({
+        // Remove modal from dom again when it is done
+        $("#irma-server-modal").on("hidden.bs.modal", function() {
+            $("#irma-server-modal").remove();
+        });
+
+        $("#irma-server-modal .modal-content, #irma-server-modal .modal-content div, #irma-server-modal iframe").css({
             "width": "455px",
             "height": "570px",
             "margin": "0",
             "padding": "0",
         });
-        $(".modal-content").css({
+        $("#irma-server-modal .modal-content").css({
             "margin": "0 auto",
             "border-radius": "0",
         });
 
         // Show the modal
-        $("#server-modal").modal({ backdrop: "static", keyboard: false });
+        $("#irma-server-modal").modal({ backdrop: "static", keyboard: false });
     }
 }
 
@@ -563,7 +567,7 @@ function finishSigning() {
 function closePopup() {
     if (ua !== UserAgent.Android) {
         console.log("Closing popup");
-        $("#server-modal").modal("hide");
+        $("#irma-server-modal").modal("hide");
     }
 }
 
