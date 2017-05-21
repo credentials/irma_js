@@ -1,7 +1,12 @@
 $(function() {
     function handleMessage(event) {
+        if (event.source !== window.parent) {
+            console.warn("Warning: discarding message from other source than caller: ", event);
+            return;
+        }
+
+        console.log("Received message: ", event);
         var msg = event.data;
-        console.log("Received message: ", msg);
 
         switch (msg.type) {
             case "tokenData":
@@ -20,24 +25,14 @@ $(function() {
             case "done":
                 break;
             default:
-                failure("Received unknown message: \"" + msg + "\"");
+                console.warn("Received unknown message: \"", msg, "\"");
                 break;
         }
     }
 
-    function sendMessage(data){
-        window.top.postMessage(data, "*");
-        console.log("Sent message: " + JSON.stringify(data));
-    }
-
-    function failure() {
-        console.log("ERROR: ", arguments);
-
-        if (arguments.length > 0) {
-            $(".irma_title").html("ERROR");
-            showMessage("<b>Error: <b> " + arguments[0]);
-            $("#irma_text").add_class("error");
-        }
+    function sendMessage(data) {
+        window.parent.postMessage(data, /(https?:\/\/[^/]*)\/.*/.exec(window.parent.location)[1]);
+        console.log("Sent message: ", JSON.stringify(data));
     }
 
     function showMessage(msg) {

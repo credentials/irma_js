@@ -1,7 +1,19 @@
 var jwt_decode = require("jwt-decode");
 require("bootstrap");
 
-var webServer = "";
+const STATUS_CHECK_INTERVAL = 500;
+const DEFAULT_TIMEOUT = 120 * 1000;
+
+const Action = {
+    Verifying: "Verifying",
+    Issuing: "Issuing",
+    Signing: "Signing",
+};
+
+const UserAgent = {
+    Desktop: "Desktop",
+    Android: "Android",
+};
 
 const State = {
     Initialized: "Initialized",
@@ -20,17 +32,9 @@ var state = State.Done;
 // a timeout.
 var sessionTimedOut = false;
 
-const Action = {
-    Verifying: "Verifying",
-    Issuing: "Issuing",
-    Signing: "Signing",
-};
-
 var ua;
-const UserAgent = {
-    Desktop: "Desktop",
-    Android: "Android",
-};
+
+var webServer = "";
 
 var sessionPackage;
 var sessionCounter = 0;
@@ -46,11 +50,10 @@ var actionPath;
 
 var statusWebsocket;
 
-const STATUS_CHECK_INTERVAL = 500;
-const DEFAULT_TIMEOUT = 120 * 1000;
-
 var fallbackTimer;
 var timeoutTimer;
+
+var popup = null;
 
 function info() {
     console.log("VerificationServer:", webServer);
@@ -103,8 +106,13 @@ function detectUserAgent() {
 
 function handleMessage(event) {
     var msg = event.data;
-    console.log("Received message: ", msg);
+    console.log("Received message: ", event);
     console.log("State", state);
+
+    if (popup === null || event.source !== popup) {
+        console.log("Warning: discarding message from unauthorized source: ", event.source);
+        return;
+    }
 
     // If server page is ready, the server page
     // was reloaded, reset state machine to Initialized
@@ -148,9 +156,10 @@ function sendSessionToPopup() {
 }
 
 function sendMessageToPopup(data) {
-    if ($("#irma-server-modal iframe").length) {
+    var host = /(https?:\/\/[^/]*)\/.*/.exec(webServer)[1];
+    if (popup) {
         console.log("Sending message to popup: " + JSON.stringify(data));
-        $("#irma-server-modal iframe")[0].contentWindow.postMessage(data, "*");
+        popup.postMessage(data, host);
     }
 }
 
@@ -269,6 +278,8 @@ function showPopup() {
         + "<iframe frameborder='0' allowfullscreen=''></iframe>"
         + "</div></div></div></div>")
             .appendTo("body");
+
+        popup = $("#irma-server-modal iframe")[0].contentWindow;
 
         // Might as well start loading the iframe's content already
         $("#irma-server-modal iframe").attr("src", webServer + serverPage);
