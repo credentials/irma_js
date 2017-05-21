@@ -383,7 +383,7 @@ function setupFallbackMonitoring() {
              statusWebsocket.readyState !== 1 ) {
             // Status WebSocket is not active, check using polling
             var xhr = new XMLHttpRequest();
-            xhr.open("GET", encodeURI(status_url + "?" + Math.random()));
+            xhr.open("GET", encodeURI(status_url));
             xhr.onload = function () { handleFallbackStatusUpdate(xhr); };
             xhr.send();
         }
