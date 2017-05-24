@@ -31,7 +31,7 @@ $(function() {
     }
 
     function sendMessage(data) {
-        window.parent.postMessage(data, /(https?:\/\/[^/]*)\/.*/.exec(window.parent.location)[1]);
+        window.parent.postMessage(data, "*");
         console.log("Sent message: ", JSON.stringify(data));
     }
 
