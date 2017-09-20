@@ -98,7 +98,7 @@ A full working minimal example is:
                     ]
                 }
             };
-            var success = function(jwt) { console.log("Success:", jwt); alert(“Success”); }
+            var success = function(jwt) { console.log("Success:", jwt); alert("Success"); }
             var warning = function() { console.log("Warning:", arguments); }
             var error = function() { console.log("Error:", arguments); }
             var clicked = function() {
