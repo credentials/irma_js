@@ -86,6 +86,7 @@ A full working minimal example is:
     <head>
         <meta value="https://demo.irmacard.org/tomcat/irma_api_server/server/" name="irma-web-server">
         <meta value="https://demo.irmacard.org/tomcat/irma_api_server/api/v2/" name="irma-api-server">
+        <script src="https://code.jquery.com/jquery-3.2.1.min.js" type="text/javascript"></script>
         <script src="https://demo.irmacard.org/tomcat/irma_api_server/client/irma.js" type="text/javascript" defer async></script>
         <script type="text/javascript">
             var sprequest = {
