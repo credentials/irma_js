@@ -43,16 +43,18 @@ function showMessage(msg) {
     $("#irma_text").html(msg);
 }
 
-$("#cancel_button").on("click", function() {
-    sendMessage({
-        type: "userCancelled",
-    });
-});
-
 window.addEventListener("message", handleMessage, false);
 
 sendMessage({
     type: "serverPageReady",
+});
+
+$(function () {
+    $("#cancel_button").on("click", function() {
+        sendMessage({
+            type: "userCancelled",
+        });
+    });
 });
 
 console.log("Server module loaded");
