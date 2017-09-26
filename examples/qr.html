@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>IRMA issuing test</title>
+        <meta name="irma-web-server" value="<IRMA_WEB_SERVER>">
+        <meta name="irma-api-server" value="<IRMA_API_SERVER>">
+
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <script type="text/javascript" src="../bower_components/jquery/dist/jquery.js"></script>
+        <script type="text/javascript" src="../client/irma.js" async defer></script>
+        <script type="text/javascript" src="qr.js"></script>
+
+        <link href="../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    </head>
+    <body>
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12 col-md-8 col-lg-6 col-md-offset-2 col-lg-offset-3">
+                    <h2>Issuing test from QR</h2>
+
+                    <div id="alert_box"></div>
+
+                    <p>
+                        This demonstrates an alternative way to start an IRMA session:
+                        <pre>IRMA.issueFromQr(sessionPackage, success_cb, cancel_cb, failure_cb);</pre>
+                        where <code>sessionPackage</code> is the contents of an IRMA issuance
+                        QR as returned by the API server's issuance creation call
+                        (instead of <code>IRMA.issue(jwt, success_cb, cancel_cb, failure_cb)</code>,
+                        which also creates the session at the API server.)
+                    </p>
+
+                    <p>
+                        For disclosing and signing, there are equivalent functions
+                        <code>IRMA.verifyFromQr(qr, success_cb, cancel_cb, failure_cb)</code>
+                        and <code>IRMA.signFromQr(qr, success_cb, cancel_cb, failure_cb)</code>,
+                        respectively.
+                    </p>
+
+                    <form>
+                        <div class="form-group" id="groupStreet">
+                            <label class="control-label" for="inputStreet">Street</label>
+                            <input type="text" class="form-control" id="inputStreet"
+                                   value="Toernooiveld 212">
+                        </div>
+                        <div class="form-group" id="groupZipCode">
+                            <label class="control-label" for="inputZipCode">Zip Code</label>
+                            <input type="text" class="form-control" id="inputZipCode"
+                                   value="6525EC">
+                        </div>
+                        <div class="form-group" id="groupCity">
+                            <label class="control-label" for="inputCity">City</label>
+                            <input type="text" class="form-control" id="inputCity"
+                                   value="Nijmegen">
+                        </div>
+                        <div class="form-group" id="groupCountry">
+                            <label class="control-label" for="inputCountry">Country</label>
+                            <input type="text" class="form-control" id="inputCountry"
+                                   value="The Netherlands">
+                        </div>
+                    </form>
+                    <button id="irma_btn" class="btn btn-primary">Issue credentials</button>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
