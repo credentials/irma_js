@@ -13,6 +13,30 @@ module.exports = function (grunt) {
     web_server_url = grunt.option("web_server_url") || server_url + "server/";
     api_server_url = grunt.option("api_server_url") || server_url + "api/v2/";
 
+    var client = false, server = false, examples = false, type = grunt.option("type");
+    if (typeof(type) === "undefined") {
+        type = "all";
+    }
+    switch (type) {
+        case "client":
+            client = true;
+            break;
+        case "server":
+            server = true;
+            break;
+        case "both":
+            client = true;
+            server = true;
+            break;
+        case "all":
+            client = true;
+            server = true;
+            examples = true;
+            break;
+        default:
+        console.log("WARNING: unrecognized value for --type: " + type);
+    }
+
     console.log("Web server url:", web_server_url);
     console.log("Api server url:", api_server_url);
 
@@ -147,5 +171,18 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks("grunt-contrib-uglify");
 
     grunt.registerTask("default", ["string-replace", "watch"]);
-    grunt.registerTask("build", ["browserify", "sass", "uglify", "copy", "string-replace"]);
+
+    var tasks = [];
+    if (client) {
+        tasks.push("browserify:client", "uglify", "copy:client", "copy:bower_bundle");
+    }
+    if (server) {
+        tasks.push("browserify:server", "sass", "copy:server");
+        if (!tasks.includes("copy:bower_bundle"))
+            tasks.push("copy:bower_bundle");
+    }
+    if (examples) {
+        tasks.push("string-replace", "copy:examples");
+    }
+    grunt.registerTask("build", tasks);
 };
