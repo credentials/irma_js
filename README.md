@@ -205,7 +205,9 @@ to build the libraries and examples. See below for how to setup server URLs for 
 
     grunt build watch
 
-to keep rebuilding the files as they change.
+to keep rebuilding the files as they change. If you specify neither `build` nor `watch`, `build watch` is implied.
+
+Using the flags `--client`, `--server` and `--examples` you can specify which of the three subfolders should be built. If you specify none of these, all three will be built.
 
 ## URLs for api web pages and apis
 

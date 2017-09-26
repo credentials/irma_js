@@ -13,28 +13,12 @@ module.exports = function (grunt) {
     web_server_url = grunt.option("web_server_url") || server_url + "server/";
     api_server_url = grunt.option("api_server_url") || server_url + "api/v2/";
 
-    var client = false, server = false, examples = false, type = grunt.option("type");
-    if (typeof(type) === "undefined") {
-        type = "all";
-    }
-    switch (type) {
-        case "client":
-            client = true;
-            break;
-        case "server":
-            server = true;
-            break;
-        case "both":
-            client = true;
-            server = true;
-            break;
-        case "all":
-            client = true;
-            server = true;
-            examples = true;
-            break;
-        default:
-        console.log("WARNING: unrecognized value for --type: " + type);
+    var client = grunt.option("client") || false;
+    var server = grunt.option("server") || false;
+    var examples = grunt.option("examples") || false;
+    if (!client && !server && !examples) {
+        console.log("INFO: building everything");
+        client = server = examples = true;
     }
 
     console.log("Web server url:", web_server_url);
@@ -173,7 +157,7 @@ module.exports = function (grunt) {
                     dest: "build/",
                     expand: "true",
                 }],
-                options: replacements,
+                options: { replacements: replacements },
             },
             examples: {
                 files: [{
@@ -182,7 +166,7 @@ module.exports = function (grunt) {
                     dest: "build/",
                     expand: "true",
                 }],
-                options: replacements,
+                options: { replacements: replacements },
             },
         },
         watch: watchTasks,
