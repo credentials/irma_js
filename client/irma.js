@@ -53,8 +53,6 @@ var statusWebsocket;
 var fallbackTimer;
 var timeoutTimer;
 
-var popup = null;
-
 function info() {
     console.log("VerificationServer:", webServer);
 }
@@ -106,13 +104,8 @@ function detectUserAgent() {
 
 function handleMessage(event) {
     var msg = event.data;
-    console.log("Received message: ", event);
+    console.log("Received message: ", msg);
     console.log("State", state);
-
-    if (popup === null || event.source !== popup) {
-        console.log("Warning: discarding message from unauthorized source: ", event.source);
-        return;
-    }
 
     // If server page is ready, the server page
     // was reloaded, reset state machine to Initialized
@@ -156,10 +149,9 @@ function sendSessionToPopup() {
 }
 
 function sendMessageToPopup(data) {
-    var host = /(https?:\/\/[^/]*)\/.*/.exec(webServer)[1];
-    if (popup) {
+    if ($("#irma-server-modal iframe").length) {
         console.log("Sending message to popup: " + JSON.stringify(data));
-        popup.postMessage(data, host);
+        $("#irma-server-modal iframe")[0].contentWindow.postMessage(data, "*");
     }
 }
 
@@ -279,8 +271,6 @@ function showPopup() {
         + "</div></div></div></div>")
             .appendTo("body");
 
-        popup = $("#irma-server-modal iframe")[0].contentWindow;
-
         // Might as well start loading the iframe's content already
         $("#irma-server-modal iframe").attr("src", webServer + serverPage);
 
@@ -348,6 +338,7 @@ function handleInitialServerMessage(xhr, scounter) {
 
     console.log("Setting sessionPackage");
     sessionPackage = {
+        irmaqr: sessionData.irmaqr,
         v: sessionData.v,
         vmax: sessionData.vmax,
         u: actionPath + sessionId,
@@ -394,7 +385,7 @@ function setupFallbackMonitoring() {
              statusWebsocket.readyState !== 1 ) {
             // Status WebSocket is not active, check using polling
             var xhr = new XMLHttpRequest();
-            xhr.open("GET", encodeURI(status_url));
+            xhr.open("GET", encodeURI(status_url + "?" + Math.random()));
             xhr.onload = function () { handleFallbackStatusUpdate(xhr); };
             xhr.send();
         }
