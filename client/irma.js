@@ -337,12 +337,8 @@ function handleInitialServerMessage(xhr, scounter) {
     }
 
     console.log("Setting sessionPackage");
-    sessionPackage = {
-        irmaqr: sessionData.irmaqr,
-        v: sessionData.v,
-        vmax: sessionData.vmax,
-        u: actionPath + sessionId,
-    };
+    sessionPackage = sessionData;
+    sessionPackage.u = actionPath + sessionId;
     console.log("sessionPackage", sessionPackage);
 
     startSession();
