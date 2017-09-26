@@ -40,6 +40,61 @@ module.exports = function (grunt) {
     console.log("Web server url:", web_server_url);
     console.log("Api server url:", api_server_url);
 
+    var tasks = [];
+    var watchTasks = {};
+    if (client) {
+        tasks.push("browserify:client", "uglify", "copy:bower_bundle");
+
+        watchTasks.clientScripts = {
+            files: ["./client/*.js"],
+            tasks: ["browserify:client", "uglify"],
+        };
+    }
+
+    if (server) {
+        tasks.push("browserify:server", "sass", "copy:server", "string-replace:server");
+        if (!tasks.includes("copy:bower_bundle"))
+            tasks.push("copy:bower_bundle");
+
+        watchTasks.serverScripts = {
+            files: ["./server/*.js"],
+            tasks: ["browserify:server"],
+        };
+        watchTasks.sass = {
+            files: ["./server/**/*.scss"],
+            tasks: ["sass"],
+        };
+        watchTasks.serverhtmlFiles = {
+            files: [ "./server/**/*.html" ],
+            tasks: ["string-replace"],
+        };
+        watchTasks.webFiles = {
+            files: [ "./server/**/*", "!./server/**/*.{scss,html}", "!./server/**/*.js" ],
+            tasks: ["copy"],
+        };
+    }
+
+    if (examples) {
+        tasks.push("copy:examples", "string-replace");
+
+        watchTasks.htmlfiles = {
+            files: [ "./examples/**/*.html" ],
+            tasks: ["string-replace"],
+        };
+        watchTasks.exampleScripts = {
+            files: ["./examples/*.js"],
+            tasks: ["copy"],
+        };
+    }
+
+    var replacements = [{
+        pattern: "<IRMA_WEB_SERVER>",
+        replacement: web_server_url,
+    }, {
+        pattern: "<IRMA_API_SERVER>",
+        replacement: api_server_url,
+    }];
+
     grunt.initConfig({
         browserify: {
             options: {
@@ -103,12 +158,6 @@ module.exports = function (grunt) {
                 dest: "build/examples",
                 expand: "true",
             },
-            client: {
-                cwd: "client",
-                src: ["**/*", "!**/*.{js,scss,html}"],
-                dest: "build/client",
-                expand: "true",
-            },
             server: {
                 cwd: "server",
                 src: ["**/*", "!**/*.{js,scss,html}"],
@@ -117,49 +166,26 @@ module.exports = function (grunt) {
             },
         },
         "string-replace": {
-            examples: {
+            server: {
                 files: [{
                     cwd: "./",
-                    src: ["{client,server,examples}/**/*.html"],
+                    src: ["server/**/*.html"],
                     dest: "build/",
                     expand: "true",
                 }],
-                options: {
-                    replacements: [{
-                        pattern: "<IRMA_WEB_SERVER>",
-                        replacement: web_server_url,
-                    }, {
-                        pattern: "<IRMA_API_SERVER>",
-                        replacement: api_server_url,
-                    }],
-                },
+                options: replacements,
+            },
+            examples: {
+                files: [{
+                    cwd: "./",
+                    src: ["examples/**/*.html"],
+                    dest: "build/",
+                    expand: "true",
+                }],
+                options: replacements,
             },
         },
-        watch: {
-            scripts: {
-                files: ["./{client,server}/*.js"],
-                tasks: ["browserify"],
-            },
-            sass: {
-                files: ["./{client,server}/**/*.scss"],
-                tasks: ["sass"],
-            },
-            webfiles: {
-                files: [
-                    "./{client,server}/**/*",
-                    "./examples/**/*",
-                    "!./{client,server,examples}/**/*.{scss,html}",
-                    "!./{client,server}/**/*.js",
-                ],
-                tasks: ["copy"],
-            },
-            htmlfiles: {
-                files: [
-                    "./{client,server,examples}/**/*.html",
-                ],
-                tasks: ["string-replace"],
-            },
-        },
+        watch: watchTasks,
     });
 
     grunt.loadNpmTasks("grunt-browserify");
@@ -170,19 +196,6 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks("grunt-string-replace");
     grunt.loadNpmTasks("grunt-contrib-uglify");
 
-    grunt.registerTask("default", ["string-replace", "watch"]);
-
-    var tasks = [];
-    if (client) {
-        tasks.push("browserify:client", "uglify", "copy:client", "copy:bower_bundle");
-    }
-    if (server) {
-        tasks.push("browserify:server", "sass", "copy:server");
-        if (!tasks.includes("copy:bower_bundle"))
-            tasks.push("copy:bower_bundle");
-    }
-    if (examples) {
-        tasks.push("string-replace", "copy:examples");
-    }
+    grunt.registerTask("default", ["build", "watch"]);
     grunt.registerTask("build", tasks);
 };
