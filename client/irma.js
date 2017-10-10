@@ -13,6 +13,7 @@ const Action = {
 const UserAgent = {
     Desktop: "Desktop",
     Android: "Android",
+    iOS: "iOS",
 };
 
 const State = {
@@ -96,8 +97,12 @@ function detectUserAgent() {
     if ( /Android/i.test(navigator.userAgent) ) {
         console.log("Detected Android");
         ua = UserAgent.Android;
+    } else if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) {
+        // https://stackoverflow.com/questions/9038625/detect-if-device-is-ios
+        console.log("Detected iOS");
+        ua = UserAgent.iOS;
     } else {
-        console.log("Detected Desktop");
+        console.log("Neither Android nor iOS, assuming desktop");
         ua = UserAgent.Desktop;
     }
 }
@@ -467,14 +472,15 @@ function cancelTimers () {
 function connectClientToken() {
     // This is only for android, the popup for desktop has already been opened
     // so as to not trigger the popup blockers
-    // TODO for now only for android client
     if (ua === UserAgent.Android) {
-        // Android code
         // TODO: handle URL more nicely
         var newUrl = "intent://#Intent;package=org.irmacard.cardemu;scheme=cardemu;"
             + "l.timestamp=" + Date.now() + ";"
             + "S.qr=" + encodeURIComponent(JSON.stringify(sessionPackage)) + ";"
             + "S.browser_fallback_url=http%3A%2F%2Fapp.irmacard.org%2Fverify;end";
+        window.location.href = newUrl;
+    } else if (ua === UserAgent.iOS) {
+        var newUrl = "irma://qr/json/" + encodeURIComponent(JSON.stringify(sessionPackage));
         window.location.href = newUrl;
     }
 }

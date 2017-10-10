@@ -4,20 +4,17 @@ var iprequest = {
     request: {
         "credentials": [
             {
-                "credential": "irma-demo.MijnOverheid.address",
+                // "credential": "irma-demo.MijnOverheid.address",
+                "credential": "irma-demo.RU.studentCard",
                 "attributes": {
-                    "country": "The Netherlands",
-                    "city": "Nijmegen",
-                    "street": "Toernooiveld 212",
-                    "zipcode": "6525 EC"
-                }
-            }
-        ],
-        "disclose": [
-            {
-                "label": "Age (higher)",
-                "attributes": {
-                    "irma-demo.MijnOverheid.ageHigher": "present"
+                    // "country": "The Netherlands",
+                    // "city": "Nijmegen",
+                    // "street": "Toernooiveld 212",
+                    // "zipcode": "6525 EC"
+                    "university":        "Radboud",
+                    "studentCardNumber": "3.14159265358979323846264338328",
+                    "studentID":         "s1234567",
+                    "level":             "42"
                 }
             }
         ]
@@ -73,15 +70,15 @@ $(function() {
             $("#groupCountry").addClass("has-error");
         }
 
-        var attributes = {
-            "country": country,
-            "city": city,
-            "street": street,
-            "zipcode": zipcode
-        };
-        console.log(attributes);
+        // var attributes = {
+        //     "country": country,
+        //     "city": city,
+        //     "street": street,
+        //     "zipcode": zipcode
+        // };
+        // console.log(attributes);
 
-        iprequest.request.credentials[0].attributes = attributes;
+        // iprequest.request.credentials[0].attributes = attributes;
         console.log(iprequest);
         if (error) {
             showWarning("Fields may not be empty");
