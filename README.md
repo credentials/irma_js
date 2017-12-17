@@ -1,9 +1,9 @@
 IRMA Javascript client
 ======================
 
-This is a Javascript client of the RESTful JSON API offered by the [IRMA API server](https://github.com/credentials/irma_api_server). It offers a library that allows you to use the API server to:
+This is a Javascript client of the RESTful JSON API offered by the [IRMA API server](https://github.com/privacybydesign/irma_api_server). It offers a library that allows you to use the API server to:
 
- * Verify IRMA attributes. You specify which attributes, the library handles the user interaction and the communication with the API server and the IRMA token (such as the [IRMA Android app](https://github.com/credentials/irma_android_cardemu)). Finally, the API server signes a JWT (JSON Web Token) containing the attributes (provided the attributes are valid), after which the library returns this signed JWT.
+ * Verify IRMA attributes. You specify which attributes, the library handles the user interaction and the communication with the API server and the IRMA token (such as the [IRMA Android app](https://github.com/privacybydesign/irma_android_cardemu)). Finally, the API server signes a JWT (JSON Web Token) containing the attributes (provided the attributes are valid), after which the library returns this signed JWT.
  * Issue IRMA attributes. You put the credentials to be issued in a signed JWT, the library handles the user interaction and the communication with the API server. (The API server does need to allow you to issue these credentials).
  * Create IMRA attribute-based signatures (experimental): signature on a string to which IRMA attributes are verifiably attached.
 
