@@ -470,18 +470,15 @@ function cancelTimers () {
 }
 
 function connectClientToken() {
-    // This is only for android, the popup for desktop has already been opened
-    // so as to not trigger the popup blockers
+    var url = "qr/json/" + encodeURIComponent(JSON.stringify(sessionPackage));
     if (ua === UserAgent.Android) {
-        // TODO: handle URL more nicely
-        var newUrl = "intent://#Intent;package=org.irmacard.cardemu;scheme=cardemu;"
+        var intent = "intent://" + url + "#Intent;package=org.irmacard.cardemu;scheme=cardemu;"
             + "l.timestamp=" + Date.now() + ";"
             + "S.qr=" + encodeURIComponent(JSON.stringify(sessionPackage)) + ";"
             + "S.browser_fallback_url=http%3A%2F%2Fapp.irmacard.org%2Fverify;end";
-        window.location.href = newUrl;
+        window.location.href = intent;
     } else if (ua === UserAgent.iOS) {
-        var newUrl = "irma://qr/json/" + encodeURIComponent(JSON.stringify(sessionPackage));
-        window.location.href = newUrl;
+        window.location.href = "irma://" + url;
     }
 }
 
