@@ -59,7 +59,7 @@ function info() {
 }
 
 function failure(msg, ...data) {
-    console.log("ERROR:", msg, ...data);
+    console.error("ERROR:", msg, ...data);
 
     state = State.Done;
     closePopup();
@@ -310,6 +310,7 @@ function doInitialRequest(request, success_cb, cancel_cb, failure_cb) {
     xhr.setRequestHeader("Content-Type", "text/plain");
     var currentSessionCounter = sessionCounter;
     xhr.onload = function() { handleInitialServerMessage(xhr, currentSessionCounter); };
+    xhr.onerror = function() { failure('Could not do initial request to the API server', xhr.statusText); };
     xhr.send(request);
 }
 
