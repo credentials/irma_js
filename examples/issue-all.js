@@ -76,13 +76,6 @@ $(function() {
             }
         },
         {
-            "credential": "irma-demo.Surfnet.root",
-            "attributes": {
-                "userID": "s1234567@student.ru.nl",
-                "securityHash": "DEADBEEF"
-            }
-        },
-        {
             "credential": "irma-demo.IRMATube.member",
             "attributes": {
                 "type": "regular",
