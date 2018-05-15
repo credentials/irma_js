@@ -58,15 +58,15 @@ function info() {
     console.log("VerificationServer:", webServer);
 }
 
-function failure(msg, ...data) {
-    console.error("ERROR:", msg, ...data);
+function failure(errorcode, msg, ...data) {
+    console.error("ERROR:", errorcode, msg, ...data);
 
     state = State.Done;
     closePopup();
     cancelTimers();
 
     if (typeof(failureCallback) !== "undefined") {
-        failureCallback(msg, ...data);
+        failureCallback(errorcode, msg, ...data);
     }
 }
 
@@ -310,7 +310,7 @@ function doInitialRequest(request, success_cb, cancel_cb, failure_cb) {
     xhr.setRequestHeader("Content-Type", "text/plain");
     var currentSessionCounter = sessionCounter;
     xhr.onload = function() { handleInitialServerMessage(xhr, currentSessionCounter); };
-    xhr.onerror = function() { failure('Could not do initial request to the API server', xhr.statusText); };
+    xhr.onerror = function() { failure("CONNERR_INITIAL", 'Could not do initial request to the API server', xhr.statusText); };
     xhr.send(request);
 }
 
@@ -322,7 +322,7 @@ function handleInitialServerMessage(xhr, scounter) {
 
     if (xhr.status !== 200) {
         var msg = "Initial call to server API failed. Returned status of " + xhr.status;
-        failure(msg);
+        failure("CONNERR_INITIAL", msg);
         return;
     }
 
@@ -330,7 +330,7 @@ function handleInitialServerMessage(xhr, scounter) {
     try {
         sessionData = JSON.parse(xhr.responseText);
     } catch (err) {
-        failure("Cannot parse server initial message: " + xhr.responseText, err);
+        failure("PROTERR_INITIAL", "Cannot parse server initial message: " + xhr.responseText, err);
         return;
     }
 
@@ -338,7 +338,7 @@ function handleInitialServerMessage(xhr, scounter) {
     sessionId = sessionData.u;
 
     if ( typeof(sessionVersion) === "undefined" || typeof(sessionId) === "undefined" ) {
-        failure("Field 'u' or 'v' missing in initial server message");
+        failure("PROTERR_VERSION", "Field 'u' or 'v' missing in initial server message");
         return;
     }
 
@@ -457,7 +457,7 @@ function handleFallbackStatusUpdate(xhr) {
             timeoutSession();
             return;
         }
-        failure("Status poll from server failed. Returned status of " + xhr.status, xhr);
+        failure("CONNERR_STATUS", "Status poll from server failed. Returned status of " + xhr.status, xhr);
     }
 }
 
@@ -505,7 +505,7 @@ function receiveStatusMessage(data) {
             handleStatusMessageClientConnected(msg);
             break;
         default:
-            failure("ERROR: unknown current state", state);
+            failure("INTERR_STATE", "ERROR: unknown current state", state);
             break;
     }
 }
@@ -520,7 +520,7 @@ function handleStatusMessageSessionStarted(msg) {
             }
             break;
         default:
-            failure("unknown status message in Initialized state", msg);
+            failure("PROTERR_STATUS_INITIAL", "unknown status message in Initialized state", msg);
             break;
     }
 }
@@ -542,7 +542,7 @@ function handleStatusMessageClientConnected(msg) {
                 finishSigning();
             break;
         default:
-            failure("unknown status message in Connected state", msg);
+            failure("PROTERR_STATUS_CONNECTED", "unknown status message in Connected state", msg);
             break;
     }
 }
@@ -580,7 +580,7 @@ function cancelSession(cancelOld = false) {
     cancelTimers();
     if (!cancelOld) {
         closePopup();
-        cancelCallback("User cancelled authentication");
+        cancelCallback("CANCELLED", "User cancelled authentication");
     }
 }
 
@@ -599,7 +599,7 @@ function timeoutSession() {
     closeWebsocket();
     closePopup();
     cancelTimers();
-    cancelCallback("Session timeout, please try again");
+    cancelCallback("TIMEOUT", "Session timeout, please try again");
 }
 
 
@@ -616,11 +616,11 @@ function handleProofMessageFromServer(xhr) {
             successCallback(data);
         } else {
             console.log("Server rejected proof: ", token.status);
-            failureCallback("Server rejected the proof", data);
+            failureCallback("REJECTED", "Server rejected the proof", data);
         }
     } else {
         // Failure
-        failure("Request for proof from server failed. Returned status of " + xhr.status, xhr);
+        failure("CONNERR_PROOF", "Request for proof from server failed. Returned status of " + xhr.status, xhr);
     }
 }
 
