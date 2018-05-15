@@ -84,13 +84,13 @@ $(function() {
         },
     ]};
 
-    var showWarning = function(msg) {
+    var showWarning = function(errorcode, msg) {
         $("#alert_box").html('<div class="alert alert-warning" role="alert">'
                              + '<strong>Warning:</strong> '
                              + msg + '</div>');
     };
 
-    var showError = function (msg) {
+    var showError = function (errorcode, msg) {
         $("#alert_box").html('<div class="alert alert-danger" role="alert">'
                              + '<strong>Error:</strong> '
                              + msg + '</div>');
@@ -152,7 +152,7 @@ $(function() {
         });
 
         if (error) {
-            showWarning("Fields may not be empty");
+            showWarning("", "Fields may not be empty");
             return;
         }
 

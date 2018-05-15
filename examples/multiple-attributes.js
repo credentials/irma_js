@@ -7,13 +7,13 @@ $(function() {
         }
     };
 
-    function showWarning(msg) {
+    function showWarning(errorcode, msg) {
         $("#alert_box").html('<div class="alert alert-warning" role="alert">'
                              + '<strong>Warning:</strong> '
                              + msg + '</div>');
     };
 
-    function showError(msg) {
+    function showError(errorcode, msg) {
         $("#alert_box").html('<div class="alert alert-danger" role="alert">'
                              + '<strong>Error:</strong> '
                              + msg + '</div>');
@@ -63,7 +63,7 @@ $(function() {
                 var jwt = IRMA.createUnsignedVerificationJWT(sprequest);
                 IRMA.verify(jwt, success_fun, showWarning, showError);
             } else {
-                showWarning("Please select at least one attribute");
+                showWarning("", "Please select at least one attribute");
             }
         });
     }
