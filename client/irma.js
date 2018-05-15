@@ -717,8 +717,6 @@ function checkInit() {
     }
 }
 
-alert("loaded");
-
 export {
     init,
     sign,
