@@ -338,7 +338,7 @@ function handleInitialServerMessage(xhr, scounter) {
     sessionId = sessionData.u;
 
     if ( typeof(sessionVersion) === "undefined" || typeof(sessionId) === "undefined" ) {
-        failure("PROTERR_VERSION", "Field 'u' or 'v' missing in initial server message");
+        failure("PROTERR_SESSIONDATA", "Field 'u' or 'v' missing in initial server message");
         return;
     }
 
