@@ -33,6 +33,9 @@ var state = State.Done;
 // a timeout.
 var sessionTimedOut = false;
 
+// State to manage setup
+var librarySetup = false;
+
 var ua;
 
 var webServer = "";
@@ -55,6 +58,8 @@ var fallbackTimer;
 var timeoutTimer;
 
 function info() {
+    checkInit();
+    
     console.log("VerificationServer:", webServer);
 }
 
@@ -173,17 +178,23 @@ function doSessionFromQr(qr, success_cb, cancel_cb, failure_cb) {
 }
 
 function issue(jwt, success_cb, cancel_cb, failure_cb) {
+    checkInit();
+    
     action = Action.Issuing;
     actionPath = apiServer + "issue/";
     doInitialRequest(jwt, success_cb, cancel_cb, failure_cb);
 }
 
 function issueFromQr(qr, success_cb, cancel_cb, failure_cb) {
+    checkInit();
+    
     action = Action.Issuing;
     doSessionFromQr(qr, success_cb, cancel_cb, failure_cb);
 }
 
 function verify(request, success_cb, cancel_cb, failure_cb) {
+    checkInit();
+    
     // Also support bare (i.e., non-JWT) service provider requests for backwards compatibility
     // We assume that the user meant to create an unsigned JWT.
     var jwt;
@@ -204,17 +215,23 @@ function verify(request, success_cb, cancel_cb, failure_cb) {
 }
 
 function verifyFromQr(qr, success_cb, cancel_cb, failure_cb) {
+    checkInit();
+    
     action = Action.Verifying;
     doSessionFromQr(qr, success_cb, cancel_cb, failure_cb);
 }
 
 function sign(signatureRequest, success_cb, cancel_cb, failure_cb) {
+    checkInit();
+    
     action = Action.Signing;
     actionPath = apiServer + "signature/";
     doInitialRequest(signatureRequest, success_cb, cancel_cb, failure_cb);
 }
 
 function signFromQr(qr, success_cb, cancel_cb, failure_cb) {
+    checkInit();
+    
     action = Action.Signing;
     doSessionFromQr(qr, success_cb, cancel_cb, failure_cb);
 }
@@ -638,6 +655,8 @@ function base64url(src) {
 }
 
 function createJWT(request, requesttype, subject, issuer) {
+    checkInit();
+    
     console.log("Creating unsigned JWT!!!");
     var header = {
         alg: "none",
@@ -673,12 +692,35 @@ function createUnsignedSignatureJWT(absrequest) {
     return createJWT(absrequest, "absrequest", "signature_request", "testsigclient");
 }
 
-// Initialize
-getSetupFromMetas();
-detectUserAgent();
-window.addEventListener("message", handleMessage, false);
+function init(irmawebserver="", irmaapiserver="") {
+    if (librarySetup) {
+        console.log("WARNING: double call to init.");
+        return;
+    }
+    
+    if (irmawebserver === "" || irmaapiserver === "") {
+        console.log("WARNING: Fetching web and api server from meta tags is deprecated, and may be removed in future versions.");
+        getSetupFromMetas();
+    } else {
+        webServer = irmawebserver;
+        apiServer = irmaapiserver;
+    }
+    detectUserAgent();
+    window.addEventListener("message", handleMessage, false);
+    librarySetup = true;
+}
+
+function checkInit() {
+    if (!librarySetup) {
+        console.log("WARNING: No previous call to init.");
+        init()
+    }
+}
+
+alert("loaded");
 
 export {
+    init,
     sign,
     verify,
     issue,
