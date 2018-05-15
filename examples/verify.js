@@ -18,6 +18,8 @@ $(function() {
     };
 
     function init() {
+        IRMA.init("<IRMA_WEB_SERVER>", "<IRMA_API_SERVER>");
+        
         console.log("Init called!");
         var btn = document.getElementById("try_irma_btn")
         var success_fun = function(data) {
