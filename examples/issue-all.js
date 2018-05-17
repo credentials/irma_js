@@ -1,5 +1,5 @@
 $(function() {
-    IRMA.init("<IRMA_WEB_SERVER>", "<IRMA_API_SERVER>");
+    IRMA.init("<IRMA_API_SERVER>", "<IRMA_WEB_SERVER>");
 
     var iprequest = {
         data: "foobar",
