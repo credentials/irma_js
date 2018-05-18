@@ -148,6 +148,11 @@ function sendSessionToPopup() {
     $(".irma_option_container").show();
 }
 
+function showMessageOnPopup(msg) {
+    $("#irma_text").text(msg);
+    $(".irma_option_container").hide();
+}
+
 function doSessionFromQr(qr, success_cb, cancel_cb, failure_cb) {
     clearState();
     showPopup();
@@ -536,8 +541,7 @@ function handleStatusMessageSessionStarted(msg) {
             if (state === State.SessionStarted) {
                 console.log("Client device has connected with the server");
                 state = State.ClientConnected;
-                $("#irma_text").text("Please follow the instructions on your IRMA token");
-                $(".irma_option_container").hide();
+                showMessageOnPopup("Please follow the instructions on your IRMA token");
             }
             break;
         default:
