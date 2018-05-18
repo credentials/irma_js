@@ -122,6 +122,11 @@ module.exports = function (grunt) {
                 style: "expanded",
                 includePaths: ["bower_components/compass-mixins/lib"],
             },
+            client: {
+                files: {
+                    "./build/client/irma.css": "server/sass/irma.scss",
+                }
+            },
             server: {
                 files: {
                     "./build/server/css/irma.css": "server/sass/irma.scss",

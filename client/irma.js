@@ -1,5 +1,6 @@
 var jwt_decode = require("jwt-decode");
 require("bootstrap");
+var kjua = require("kjua");
 
 const STATUS_CHECK_INTERVAL = 500;
 const DEFAULT_TIMEOUT = 120 * 1000;
@@ -26,6 +27,21 @@ const State = {
     Done: "Done",
 };
 var state = State.Done;
+
+const PopupStrings = {
+    Sign: {
+        Title: 'signing',
+        Body: 'A website requested that you sign a message using some IRMA attributes. Please scan the QR code with your phone.'
+    },
+    Verify: {
+        Title: 'showing attribute(s)',
+        Body: 'A website requested that you disclose some IRMA attributes. Please scan the QR code with your phone.'
+    },
+    Issue: {
+        Title: 'issuing attribute(s)',
+        Body: 'A website wants to issue some IRMA attributes to you. Please scan the QR code with your phone to continue.'
+    }
+};
 
 // Extra state, this flag is set when we timeout locally but the
 // status socket is still active. After this flag is set, we assume
@@ -111,57 +127,22 @@ function detectUserAgent() {
     }
 }
 
-function handleMessage(event) {
-    var msg = event.data;
-    console.log("Received message: ", msg);
-    console.log("State", state);
-
-    // If server page is ready, the server page
-    // was reloaded, reset state machine to Initialized
-    switch (msg.type) {
-        case "serverPageReady":
-            if (state === State.Done || state === State.Cancelled) {
-                console.log("Closing popup");
-                closePopup();
-                return;
-            }
-
-            if (state === State.SessionStarted) {
-                console.log("Sending session to popup in handleMessage()");
-                sendSessionToPopup();
-            } else {
-                // Apparently session data is slow to come in
-                state = State.PopupReady;
-            }
-            break;
-        case "userCancelled":
-            cancelSession();
-
-            // Inform the server too
-            var xhr = new XMLHttpRequest();
-            xhr.open("DELETE", encodeURI( actionPath + sessionId ));
-            xhr.onload = function () {};
-            xhr.send();
-
-            break;
-        default:
-            console.log("Didn't expect the following message from the popup", msg);
-            break;
-    }
+function userCancelled(){
+    cancelSession();
+    
+    var xhr = new XMLHttpRequest();
+        xhr.open("DELETE", encodeURI( actionPath + sessionId ));
+        xhr.onload = function () {};
+        xhr.send();
 }
 
 function sendSessionToPopup() {
-    sendMessageToPopup({
-        type: "tokenData",
-        message: sessionPackage,
-    });
-}
-
-function sendMessageToPopup(data) {
-    if ($("#irma-server-modal iframe").length) {
-        console.log("Sending message to popup: " + JSON.stringify(data));
-        $("#irma-server-modal iframe")[0].contentWindow.postMessage(data, "*");
-    }
+    $("#qrcode").empty().append(kjua({
+        text: JSON.stringify(sessionPackage),
+        size: 230,
+    }));
+    $("#spinner").hide();
+    $(".irma_option_container").show();
 }
 
 function doSessionFromQr(qr, success_cb, cancel_cb, failure_cb) {
@@ -279,33 +260,57 @@ function showPopup() {
         console.log("Trying to open popup");
         var serverPage;
         if (action === Action.Issuing)
-            serverPage = "issue.html";
+            serverPage = PopupStrings.Issue;
         else if (action === Action.Verifying)
-            serverPage = "verify.html";
+            serverPage = PopupStrings.Verify;
         else
-            serverPage = "sign.html";
+            serverPage = PopupStrings.Sign;
 
-        // Add modal iframe
+        console.log("serverPage: ", serverPage);
+
+        // Add modal
         $("<div id='irma-server-modal' class='modal fade' tabindex='-1' role='dialog' aria-hidden='true'>"
         + "<div class='modal-dialog'><div class='modal-content'><div class='modal-body'>"
-        + "<iframe frameborder='0' allowfullscreen=''></iframe>"
+        + "<div class='irma_page'>"
+        + "<div class='irma_content'>"
+        + "<img src='../server/img/irma_logo_160px.png' class='irma_logo_top' alt='IRMA logo'></img>"
+        + "<div class='irma_title'></div>"
+        + "<p id='irma_text'></p>"
+        + "<div id='spinner' class='load6'>"
+        + "<div class='loader'>Waiting for data...</div>"
+        + "</div>"
+        + "<div class='irma_option_container' style='display:none;'>"
+        + "<div id='qrcode' class='irma_option_box'></div>"
+        + "</div>"
+        + "</div>"
+        + "<div class='irma_button_box'>"
+        + "<button class='irma_button' id='cancel_button'>Cancel</button>"
+        + "</div>"
+        + "</div>"
         + "</div></div></div></div>")
             .appendTo("body");
-
-        // Might as well start loading the iframe's content already
-        $("#irma-server-modal iframe").attr("src", webServer + serverPage);
+        
+        // Write informational text
+        $("#irma-server-modal .irma_title").text(serverPage.Title);
+        $("#irma-server-modal #irma_text").text(serverPage.Body);
+        
+        // Bind cancel action
+        $("#cancel_button").on("click", userCancelled);
 
         // Remove modal from dom again when it is done
         $("#irma-server-modal").on("hidden.bs.modal", function() {
             $("#irma-server-modal").remove();
         });
 
-        $("#irma-server-modal .modal-content, #irma-server-modal .modal-content div, #irma-server-modal iframe").css({
+        $("#irma-server-modal .modal-content").css({
             "width": "455px",
             "height": "570px",
             "margin": "0",
             "padding": "0",
         });
+        $("#irma-server-modal .modal-content .modal-body").css({
+            "padding": "8",
+        })
         $("#irma-server-modal .modal-content").css({
             "margin": "0 auto",
             "border-radius": "0",
@@ -372,11 +377,7 @@ function startSession() {
     setupTimeoutMonitoring();
     connectClientToken();
 
-    if (state === State.PopupReady) {
-        // Popup was already ready, send session data now
-        console.log("Sending delayed popup");
-        sendSessionToPopup();
-    }
+    sendSessionToPopup();
     state = State.SessionStarted;
 }
 
@@ -532,7 +533,8 @@ function handleStatusMessageSessionStarted(msg) {
             if (state === State.SessionStarted) {
                 console.log("Client device has connected with the server");
                 state = State.ClientConnected;
-                sendMessageToPopup({ type: "clientConnected" });
+                $("#irma_text").text("Please follow the instructions on your IRMA token");
+                $(".irma_option_container").hide();
             }
             break;
         default:
@@ -706,7 +708,6 @@ function init(irmaapiserver, irmawebserver) {
     }
 
     detectUserAgent();
-    window.addEventListener("message", handleMessage, false);
     librarySetup = true;
 }
 
