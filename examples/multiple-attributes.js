@@ -1,4 +1,6 @@
 $(function() {
+    IRMA.init("<IRMA_API_SERVER>", "<IRMA_WEB_SERVER>");
+    
     // Setup verification request
     var sprequest = {
         "validity": 60,

@@ -24,7 +24,12 @@ var iprequest = {
     },
 };
 
+var apiServer = "<IRMA_API_SERVER>";
+var webServer = "<IRMA_WEB_SERVER>";
+
 $(function() {
+    IRMA.init(apiServer, webServer);
+
     var showWarning = function(errorcode, msg) {
         $("#alert_box").html('<div class="alert alert-warning" role="alert">'
                              + '<strong>Warning:</strong> '
@@ -86,13 +91,6 @@ $(function() {
         if (error) {
             showWarning("", "Fields may not be empty");
             return;
-        }
-
-        var apiServer;
-        var metas = document.getElementsByTagName("meta");
-        for (var i = 0; i < metas.length; i++) {
-            if (metas[i].getAttribute("name") === "irma-api-server")
-                apiServer = metas[i].getAttribute("value");
         }
 
         var jwt = IRMA.createUnsignedIssuanceJWT(iprequest);

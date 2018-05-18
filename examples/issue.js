@@ -33,6 +33,8 @@ $(function() {
         $("#alert_box").html('<div class="alert alert-success" role="alert">'
                              + '<strong>Success:</strong> Credentials issued </div>');
     };
+    
+    IRMA.init("<IRMA_API_SERVER>", "<IRMA_WEB_SERVER>");
 
     $("#irma_btn").on("click", function() {
         // Clear errors
