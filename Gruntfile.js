@@ -14,11 +14,10 @@ module.exports = function (grunt) {
     api_server_url = grunt.option("api_server_url") || server_url + "api/v2/";
 
     var client = grunt.option("client") || false;
-    var server = grunt.option("server") || false;
     var examples = grunt.option("examples") || false;
-    if (!client && !server && !examples) {
+    if (!client && !examples) {
         console.log("INFO: building everything");
-        client = server = examples = true;
+        client = examples = true;
     }
 
     console.log("Web server url:", web_server_url);
@@ -27,34 +26,15 @@ module.exports = function (grunt) {
     var tasks = [];
     var watchTasks = {};
     if (client) {
-        tasks.push("browserify:client", "uglify", "copy:bower_bundle");
+        tasks.push("browserify:client", "uglify", "copy:bower_bundle", "sass");
 
         watchTasks.clientScripts = {
             files: ["./client/*.js"],
             tasks: ["browserify:client", "uglify"],
         };
-    }
-
-    if (server) {
-        tasks.push("browserify:server", "sass", "copy:server", "string-replace:server");
-        if (!tasks.includes("copy:bower_bundle"))
-            tasks.push("copy:bower_bundle");
-
-        watchTasks.serverScripts = {
-            files: ["./server/*.js"],
-            tasks: ["browserify:server"],
-        };
         watchTasks.sass = {
-            files: ["./server/**/*.scss"],
+            files: ["./client/**/*.scss"],
             tasks: ["sass"],
-        };
-        watchTasks.serverhtmlFiles = {
-            files: [ "./server/**/*.html" ],
-            tasks: ["string-replace"],
-        };
-        watchTasks.webFiles = {
-            files: [ "./server/**/*", "!./server/**/*.{scss,html}", "!./server/**/*.js" ],
-            tasks: ["copy"],
         };
     }
 
@@ -101,11 +81,6 @@ module.exports = function (grunt) {
                     "./build/client/irma.js": ["./client/irma.js"],
                 },
             },
-            server: {
-                files: {
-                    "./build/server/bundle.js": ["./server/irma.js"],
-                },
-            },
         },
         uglify: {
             client: {
@@ -124,13 +99,8 @@ module.exports = function (grunt) {
             },
             client: {
                 files: {
-                    "./build/client/irma.css": "server/sass/irma.scss",
+                    "./build/client/irma.css": "client/sass/irma.scss",
                 }
-            },
-            server: {
-                files: {
-                    "./build/server/css/irma.css": "server/sass/irma.scss",
-                },
             },
         },
         copy: {
@@ -147,23 +117,8 @@ module.exports = function (grunt) {
                 dest: "build/examples",
                 expand: "true",
             },
-            server: {
-                cwd: "server",
-                src: ["**/*", "!**/*.{js,scss,html}"],
-                dest: "build/server",
-                expand: "true",
-            },
         },
         "string-replace": {
-            server: {
-                files: [{
-                    cwd: "./",
-                    src: ["server/**/*.html"],
-                    dest: "build/",
-                    expand: "true",
-                }],
-                options: { replacements: replacements },
-            },
             examples: {
                 files: [{
                     cwd: "./",
