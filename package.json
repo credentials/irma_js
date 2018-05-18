@@ -15,7 +15,9 @@
     "grunt-contrib-watch": "^0.6.1",
     "grunt-sass": "^2.1.0",
     "grunt-string-replace": "^1.2.0",
-    "jwt-decode": "^1.5.1"
+    "jwt-decode": "^1.5.1",
+    "jquery": "^3.3.1",
+    "kjua": "^0.1.1"
   },
   "dependencies": {
     "bootstrap": "^3.3.7"

@@ -1,3 +1,6 @@
+var $ = require('jquery');
+var kjua = require('kjua');
+
 function handleMessage(event) {
     var msg = event.data;
     console.log("Received message: ", msg);
@@ -5,10 +8,10 @@ function handleMessage(event) {
     switch (msg.type) {
         case "tokenData":
             console.log("Got a QR code");
-            $("#qrcode").empty().qrcode({
+            $("#qrcode").empty().append(kjua({
                 text: JSON.stringify(msg.message),
                 size: 230,
-            });
+            }));
             $("#spinner").hide();
             $(".irma_option_container").show();
             break;
