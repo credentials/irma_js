@@ -19,17 +19,17 @@ This javascript package contains three parts:
 
 In case you quickly want to get started with setting up IRMA verification for your website please proceed as follows. First, you need an API server. For testing, feel free to user our API server. It is hosted at `https://demo.irmcard.org/tomcat/irma_api_server/`. (Please note that it only allows verifies and issues credentials in the demo domain.)
 
-First we tell `irma.js` where to find the API server
+First, we load the irma client:
 
 ```html
-<meta value="https://demo.irmacard.org/tomcat/irma_api_server/server/" name="irma-web-server">
-<meta value="https://demo.irmacard.org/tomcat/irma_api_server/api/v2/" name="irma-api-server">
+<script src="https://demo.irmacard.org/tomcat/irma_api_server/client/irma.js" type="text/javascript"></script>
 ```
 
-Next we load the client itself:
+Next, we tell `irma.js` to initialize, and where to find the API server
 
-```html
-<script src="https://demo.irmacard.org/tomcat/irma_api_server/client/irma.js" type="text/javascript" defer async></script>
+```javascript
+IRMA.init("https://demo.irmacard.org/tomcat/irma_api_server/api/v2/", 
+          "https://demo.irmacard.org/tomcat/irma_api_server/server/");
 ```
 
 ## A simple verification
@@ -84,11 +84,11 @@ A full working minimal example is:
 ```HTML
 <html>
     <head>
-        <meta value="https://demo.irmacard.org/tomcat/irma_api_server/server/" name="irma-web-server">
-        <meta value="https://demo.irmacard.org/tomcat/irma_api_server/api/v2/" name="irma-api-server">
         <script src="https://code.jquery.com/jquery-3.2.1.min.js" type="text/javascript"></script>
-        <script src="https://demo.irmacard.org/tomcat/irma_api_server/client/irma.js" type="text/javascript" defer async></script>
+        <script src="https://demo.irmacard.org/tomcat/irma_api_server/client/irma.js" type="text/javascript"></script>
         <script type="text/javascript">
+            IRMA.init("https://demo.irmacard.org/tomcat/irma_api_server/api/v2/", 
+                      "https://demo.irmacard.org/tomcat/irma_api_server/server/");
             var sprequest = {
                 "request": {
                     "content": [
