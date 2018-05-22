@@ -2,6 +2,12 @@ var jwt_decode = require("jwt-decode");
 require("bootstrap");
 var kjua = require("kjua");
 
+// Import translations
+var en = require("./languages/en.js").default;
+var nl = require("./languages/nl.js").default;
+var translations = {en, nl};
+const defaultLang = "en"; // Default after init, and fallback when a language string is not defined.
+
 const STATUS_CHECK_INTERVAL = 500;
 const DEFAULT_TIMEOUT = 120 * 1000;
 
@@ -28,20 +34,13 @@ const State = {
 };
 var state = State.Done;
 
-const PopupStrings = {
-    Sign: {
-        Title: 'signing',
-        Body: 'A website requested that you sign a message using some IRMA attributes. Please scan the QR code with your phone.'
-    },
-    Verify: {
-        Title: 'showing attribute(s)',
-        Body: 'A website requested that you disclose some IRMA attributes. Please scan the QR code with your phone.'
-    },
-    Issue: {
-        Title: 'issuing attribute(s)',
-        Body: 'A website wants to issue some IRMA attributes to you. Please scan the QR code with your phone to continue.'
-    }
+var PopupModel = {
+    "irma_title": "",
+    "irma_text": "",
+    "irma-loader": "",
+    "irma-cancel_button": ""
 };
+var curLang;
 
 // Data for irma logo
 const IrmaLogo = "data:image/png;base64,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"
@@ -91,6 +90,43 @@ function failure(msg, ...data) {
     }
 }
 
+// Basic translation functions
+function getTranslatedString(id) {
+    var parts = id.split('.');
+    var res = translations[curLang];
+    for (var part in parts) {
+        if (res === undefined) break;
+        res = res[parts[part]];
+    }
+
+    if (res === undefined) {
+        res = translations[defaultLang];
+        for (var part in parts) {
+            if (res === undefined) break;
+            res = res[parts[part]];
+        }
+    }
+
+    if (res === undefined) return "";
+    else return res;
+}
+
+function refreshTranslation() {
+    for (var element in PopupModel) {
+        $('#'+element).text(getTranslatedString(PopupModel[element]));
+    }
+}
+
+function popupChangeContent(el, id) {
+    PopupModel[el]=id;
+    $('#'+el).text(getTranslatedString(id));
+}
+
+function setLang(lang) {
+    curLang = lang;
+    refreshTranslation();
+}
+
 function getSetupFromMetas() {
     console.log("Running getSetupFromMetas");
     var metas = document.getElementsByTagName("meta");
@@ -126,7 +162,7 @@ function detectUserAgent() {
 
 function userCancelled(){
     cancelSession();
-    
+
     var xhr = new XMLHttpRequest();
         xhr.open("DELETE", encodeURI( actionPath + sessionId ));
         xhr.onload = function () {};
@@ -142,8 +178,8 @@ function sendSessionToPopup() {
     $(".irma_option_container").show();
 }
 
-function showMessageOnPopup(msg) {
-    $("#irma_text").text(msg);
+function showMessageOnPopup(id) {
+    popupChangeContent("irma_text",id);
     $(".irma_option_container").hide();
 }
 
@@ -262,11 +298,11 @@ function showPopup() {
         console.log("Trying to open popup");
         var serverPage;
         if (action === Action.Issuing)
-            serverPage = PopupStrings.Issue;
+            serverPage = "Issue";
         else if (action === Action.Verifying)
-            serverPage = PopupStrings.Verify;
+            serverPage = "Verify";
         else
-            serverPage = PopupStrings.Sign;
+            serverPage = "Sign";
 
         console.log("serverPage: ", serverPage);
 
@@ -276,26 +312,28 @@ function showPopup() {
         + "<div class='irma_page'>"
         + "<div class='irma_content'>"
         + "<img src='"+IrmaLogo+"' class='irma_logo_top' alt='IRMA logo'></img>"
-        + "<div class='irma_title'></div>"
+        + "<div class='irma_title' id='irma_title'></div>"
         + "<p id='irma_text'></p>"
         + "<div id='irma-spinner' class='irma-load6'>"
-        + "<div class='irma-loader'>Waiting for data...</div>"
+        + "<div class='irma-loader' id='irma-loader'></div>"
         + "</div>"
         + "<div class='irma_option_container' style='display:none;'>"
         + "<div id='irma-qrcode' class='irma_option_box'></div>"
         + "</div>"
         + "</div>"
         + "<div class='irma_button_box'>"
-        + "<button class='irma_button' id='irma-cancel_button'>Cancel</button>"
+        + "<button class='irma_button' id='irma-cancel_button'></button>"
         + "</div>"
         + "</div>"
         + "</div></div></div></div>")
             .appendTo("body");
-        
-        // Write informational text
-        $("#irma-server-modal .irma_title").text(serverPage.Title);
-        $("#irma-server-modal #irma_text").text(serverPage.Body);
-        
+
+        // Write text
+        popupChangeContent("irma-cancel_button", "Common.Cancel");
+        popupChangeContent("irma-loader", "Common.WaitData");
+        popupChangeContent("irma_title", serverPage+".Title");
+        popupChangeContent("irma_text", serverPage+".Body");
+
         // Bind cancel action
         $("#irma-cancel_button").on("click", userCancelled);
 
@@ -535,7 +573,7 @@ function handleStatusMessageSessionStarted(msg) {
             if (state === State.SessionStarted) {
                 console.log("Client device has connected with the server");
                 state = State.ClientConnected;
-                showMessageOnPopup("Please follow the instructions on your IRMA token");
+                showMessageOnPopup("Messages.FollowInstructions");
             }
             break;
         default:
@@ -694,7 +732,7 @@ function createUnsignedSignatureJWT(absrequest) {
     return createJWT(absrequest, "absrequest", "signature_request", "testsigclient");
 }
 
-function init(irmaapiserver) {
+function init(irmaapiserver, lang=defaultLang) {
     if (librarySetup) {
         console.log("WARNING: double call to init.");
         return;
@@ -708,6 +746,7 @@ function init(irmaapiserver) {
     }
 
     detectUserAgent();
+    setLang(lang);
     librarySetup = true;
 }
 
@@ -720,6 +759,7 @@ function checkInit() {
 
 export {
     init,
+    setLang,
     sign,
     verify,
     issue,
