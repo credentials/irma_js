@@ -1,0 +1,42 @@
+<html>
+    <head>
+        <title>IRMA Client demo page</title>
+
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+
+        <link rel="stylesheet" href="custom-button.css">
+        <link rel="stylesheet" href="../client/irma.css">
+        <script type="text/javascript" src="../bower_components/jquery/dist/jquery.js"></script>
+        <script type="text/javascript" src="../bower_components/jwt-decode/build/jwt-decode.js"></script>
+        <script type="text/javascript" src="../client/irma.js"></script>
+        <script type="text/javascript" src="multilang.js"></script>
+    </head>
+    <body>
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12 col-md-8 col-lg-6 col-md-offset-2 col-lg-offset-3">
+                    <h2>Simple verification supporting multiple languages</h2>
+                    <p>
+                        This demo discloses your first name and whether
+                        you are 12 years old or more. It shows the resulting
+                        JSON web token. You can use the dropdown menu to select the language for the irma dialog.
+                    </p>
+                    <select id="change_language_sel">
+                        <option value="en">English</option>
+                        <option value="nl">Nederlands</option>
+                    </select>
+                    <button id="try_irma_btn" class="btn btn-primary">Verify with IRMA</button>
+
+                    <h3>Result</h3>
+                    <h2 id="result_status"></h2>
+                    <p>Raw JSON web token:</p>
+                    <pre id="token-raw"></pre>
+
+                    <p>Content of JSON web token:</p>
+                    <pre id="token-content"></pre>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
