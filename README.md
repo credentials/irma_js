@@ -19,7 +19,7 @@ This javascript package contains three parts:
 
 In case you quickly want to get started with setting up IRMA verification for your website please proceed as follows. First, you need an API server. For testing, feel free to user our API server. It is hosted at `https://demo.irmcard.org/tomcat/irma_api_server/`. (Please note that it only allows verifies and issues credentials in the demo domain.)
 
-First, we load the irma client:
+First, we load the IRMA client-side Javascript library:
 
 ```html
 <script src="https://demo.irmacard.org/tomcat/irma_api_server/client/irma.js" type="text/javascript"></script>
