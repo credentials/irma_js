@@ -23,7 +23,7 @@ module.exports = function (grunt) {
     var tasks = [];
     var watchTasks = {};
     if (client) {
-        tasks.push("browserify:client", "uglify", "copy:bower_bundle", "sass");
+        tasks.push("browserify:client", "uglify", "sass");
 
         watchTasks.clientScripts = {
             files: ["./client/*.js"],
@@ -36,7 +36,7 @@ module.exports = function (grunt) {
     }
 
     if (examples) {
-        tasks.push("copy:examples", "string-replace");
+        tasks.push("copy:examples", "string-replace", "copy:bower_bundle");
 
         watchTasks.htmlfiles = {
             files: [ "./examples/**/*.html" ],
@@ -89,7 +89,7 @@ module.exports = function (grunt) {
                 compress: false,
                 yuicompress: false,
                 style: "expanded",
-                includePaths: ["bower_components/compass-mixins/lib"],
+                includePaths: ["node_modules/compass-mixins/lib"],
             },
             client: {
                 files: {
@@ -100,8 +100,8 @@ module.exports = function (grunt) {
         copy: {
             // Copying the bower bundles is a bit of a hack
             bower_bundle: {
-                cwd: "bower_components",
-                src: ["**/*"],
+                cwd: "node_modules",
+                src: ["bootstrap/**/*", "jquery/**/*", "jwt-decode/**/*", "handlebars/**/*"],
                 dest: "build/bower_components",
                 expand: "true",
             },
