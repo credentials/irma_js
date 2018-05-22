@@ -134,11 +134,11 @@ function userCancelled(){
 }
 
 function sendSessionToPopup() {
-    $("#qrcode").empty().append(kjua({
+    $("#irma-qrcode").empty().append(kjua({
         text: JSON.stringify(sessionPackage),
         size: 230,
     }));
-    $("#spinner").hide();
+    $("#irma-spinner").hide();
     $(".irma_option_container").show();
 }
 
@@ -278,15 +278,15 @@ function showPopup() {
         + "<img src='"+IrmaLogo+"' class='irma_logo_top' alt='IRMA logo'></img>"
         + "<div class='irma_title'></div>"
         + "<p id='irma_text'></p>"
-        + "<div id='spinner' class='irma-load6'>"
+        + "<div id='irma-spinner' class='irma-load6'>"
         + "<div class='irma-loader'>Waiting for data...</div>"
         + "</div>"
         + "<div class='irma_option_container' style='display:none;'>"
-        + "<div id='qrcode' class='irma_option_box'></div>"
+        + "<div id='irma-qrcode' class='irma_option_box'></div>"
         + "</div>"
         + "</div>"
         + "<div class='irma_button_box'>"
-        + "<button class='irma_button' id='cancel_button'>Cancel</button>"
+        + "<button class='irma_button' id='irma-cancel_button'>Cancel</button>"
         + "</div>"
         + "</div>"
         + "</div></div></div></div>")
@@ -297,7 +297,7 @@ function showPopup() {
         $("#irma-server-modal #irma_text").text(serverPage.Body);
         
         // Bind cancel action
-        $("#cancel_button").on("click", userCancelled);
+        $("#irma-cancel_button").on("click", userCancelled);
 
         // Remove modal from dom again when it is done
         $("#irma-server-modal").on("hidden.bs.modal", function() {
