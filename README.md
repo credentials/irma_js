@@ -9,11 +9,10 @@ This is a Javascript client of the RESTful JSON API offered by the [IRMA API ser
 
 The flow of the various interactions in a typical IRMA session is shown [here](https://credentials.github.io/#irma-session-flow).
 
-This javascript package contains three parts:
+This javascript package contains two parts:
 
  * `client`: The IRMA Javascript library that you can use on your website if you want to integrate IRMA verification.
  * `examples`: Example pages that use various aspects of the IRMA Javascript library.
- * `server`: The modal popup containing the IRMA QR to be scanned by the IRMA token.
 
 # Getting started
 
@@ -28,8 +27,7 @@ First, we load the IRMA client-side Javascript library:
 Next, we tell `irma.js` to initialize, and where to find the API server
 
 ```javascript
-IRMA.init("https://demo.irmacard.org/tomcat/irma_api_server/api/v2/", 
-          "https://demo.irmacard.org/tomcat/irma_api_server/server/");
+IRMA.init("https://demo.irmacard.org/tomcat/irma_api_server/api/v2/");
 ```
 
 ## A simple verification
@@ -209,14 +207,11 @@ to keep rebuilding the files as they change. If you specify neither `build` nor 
 
 Using the flags `--client`, `--server` and `--examples` you can specify which of the three subfolders should be built. If you specify none of these, all three will be built.
 
-## URLs for api web pages and apis
+## URL for the api
 
-This project relies on two URLs for verifications:
+This project relies on one URL for verification: The client-side library needs to know the location of the API backend to perform the actual verifications and issuances. This can be specified in your webpage through the call to `IRMA.init`.
 
- * The examples depend on the api server's web-pages, they use this to show popups etc, you can set the api web server's url using grunt, specify it using the `--web_server_url=<URL>` option.
- * The api server's pages need to know the location of the API backend to perform the actual verifications and issuances. To set the api's url using grunt, specify it using the `--api_server_url=<URL>` option.
-
-Note that you only need the latter if you are working on the server pages. If this is the case, you might also be interested the shortcut when you run a local verification server as explained next. In particular, it also describes how you can use the `--server_url=<URL>` option to specify both the web pages and the API location in one go if you use the default setup.
+For the examples in this package, an url is required during the build proces. The default is to use the demo server at `https://demo.irmacard.org/tomcat/irma_api_server/`. To use a local verification server, one can specify the server address using the `--server_url=<URL>` option (giving it the root of the servlet) or the `--api_server_url=<URL>` option (giving it the api url). For this, you might also be interested in the shortcut explained below.
 
 ## Running a local verification server
 
