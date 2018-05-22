@@ -22,7 +22,7 @@ In case you quickly want to get started with setting up IRMA verification for yo
 First, we load the irma client:
 
 ```html
-<script src="https://demo.irmacard.org/tomcat/irma_api_server/client/irma.js" type="text/javascript" defer async></script>
+<script src="https://demo.irmacard.org/tomcat/irma_api_server/client/irma.js" type="text/javascript"></script>
 ```
 
 Next, we tell `irma.js` to initialize, and where to find the API server
@@ -84,11 +84,11 @@ A full working minimal example is:
 ```HTML
 <html>
     <head>
-        <meta value="https://demo.irmacard.org/tomcat/irma_api_server/server/" name="irma-web-server">
-        <meta value="https://demo.irmacard.org/tomcat/irma_api_server/api/v2/" name="irma-api-server">
         <script src="https://code.jquery.com/jquery-3.2.1.min.js" type="text/javascript"></script>
-        <script src="https://demo.irmacard.org/tomcat/irma_api_server/client/irma.js" type="text/javascript" defer async></script>
+        <script src="https://demo.irmacard.org/tomcat/irma_api_server/client/irma.js" type="text/javascript"></script>
         <script type="text/javascript">
+            IRMA.init("https://demo.irmacard.org/tomcat/irma_api_server/api/v2/", 
+                      "https://demo.irmacard.org/tomcat/irma_api_server/server/");
             var sprequest = {
                 "request": {
                     "content": [
