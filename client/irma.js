@@ -57,8 +57,6 @@ var librarySetup = false;
 
 var ua;
 
-var webServer = "";
-
 var sessionPackage;
 var sessionCounter = 0;
 
@@ -104,10 +102,6 @@ function getSetupFromMetas() {
 
         meta_name = meta_name.toLowerCase();
         console.log("Examining meta: ", meta_name);
-        if (meta_name === "irma-web-server") {
-            webServer = metas[i].getAttribute("value");
-            console.log("VerificationServer set to", webServer);
-        }
         if (meta_name === "irma-api-server") {
             apiServer = metas[i].getAttribute("value");
             console.log("API server set to", apiServer);
@@ -700,17 +694,16 @@ function createUnsignedSignatureJWT(absrequest) {
     return createJWT(absrequest, "absrequest", "signature_request", "testsigclient");
 }
 
-function init(irmaapiserver, irmawebserver) {
+function init(irmaapiserver) {
     if (librarySetup) {
         console.log("WARNING: double call to init.");
         return;
     }
 
-    if (irmawebserver === undefined || irmaapiserver === undefined) {
-        console.log("WARNING: Fetching api and web server from meta tags is deprecated, and may be removed in future versions.");
+    if (irmaapiserver === undefined) {
+        console.log("WARNING: Fetching api server from meta tags is deprecated, and may be removed in future versions.");
         getSetupFromMetas();
     } else {
-        webServer = irmawebserver;
         apiServer = irmaapiserver;
     }
 

@@ -20,7 +20,7 @@ $(function() {
     };
 
     function init() {
-        IRMA.init("<IRMA_API_SERVER>", "<IRMA_WEB_SERVER>");
+        IRMA.init("<IRMA_API_SERVER>");
     
         console.log("Init called!");
         var btn = document.getElementById("try_irma_btn")

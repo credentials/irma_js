@@ -25,10 +25,9 @@ var iprequest = {
 };
 
 var apiServer = "<IRMA_API_SERVER>";
-var webServer = "<IRMA_WEB_SERVER>";
 
 $(function() {
-    IRMA.init(apiServer, webServer);
+    IRMA.init(apiServer);
 
     var showWarning = function(msg) {
         $("#alert_box").html('<div class="alert alert-warning" role="alert">'
