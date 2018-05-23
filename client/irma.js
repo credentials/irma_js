@@ -752,4 +752,5 @@ export {
     createUnsignedIssuanceJWT,
     createUnsignedVerificationJWT,
     createUnsignedSignatureJWT,
+    ErrorCodes,
 };
