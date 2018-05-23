@@ -30,13 +30,13 @@ var webServer = "<IRMA_WEB_SERVER>";
 $(function() {
     IRMA.init(apiServer, webServer);
 
-    var showWarning = function(msg) {
+    var showWarning = function(errorcode, msg) {
         $("#alert_box").html('<div class="alert alert-warning" role="alert">'
                              + '<strong>Warning:</strong> '
                              + msg + '</div>');
     };
 
-    var showError = function (msg) {
+    var showError = function (errorcode, msg) {
         $("#alert_box").html('<div class="alert alert-danger" role="alert">'
                              + '<strong>Error:</strong> '
                              + msg + '</div>');
@@ -89,7 +89,7 @@ $(function() {
         iprequest.request.credentials[0].attributes = attributes;
         console.log(iprequest);
         if (error) {
-            showWarning("Fields may not be empty");
+            showWarning("", "Fields may not be empty");
             return;
         }
 
