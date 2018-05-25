@@ -32,7 +32,7 @@ module.exports = function (grunt) {
     }
 
     if (examples) {
-        tasks.push("copy:examples", "string-replace", "copy:bower_bundle");
+        tasks.push("copy:examples", "string-replace", "copy:components");
 
         watchTasks.htmlfiles = {
             files: [ "./examples/**/*.html" ],
@@ -94,11 +94,11 @@ module.exports = function (grunt) {
             },
         },
         copy: {
-            // Copying the bower bundles is a bit of a hack
-            bower_bundle: {
+            // Copying the node_modules is a bit of a hack
+            components: {
                 cwd: "node_modules",
                 src: ["bootstrap/**/*", "jquery/**/*", "jwt-decode/**/*", "handlebars/**/*"],
-                dest: "build/bower_components",
+                dest: "build/components",
                 expand: "true",
             },
             examples: {
