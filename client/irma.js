@@ -56,7 +56,7 @@ const State = {
 };
 var state = State.Done;
 
-var PopupModel = {
+var popupModel = {
     "irma-title": "",
     "irma-text": "",
     "irma-loader": "",
@@ -134,13 +134,13 @@ function getTranslatedString(id) {
 }
 
 function refreshTranslation() {
-    for (var element in PopupModel) {
-        $('#'+element).text(getTranslatedString(PopupModel[element]));
+    for (var element in popupModel) {
+        $('#'+element).text(getTranslatedString(popupModel[element]));
     }
 }
 
 function popupChangeContent(el, id) {
-    PopupModel[el]=id;
+    popupModel[el]=id;
     $('#'+el).text(getTranslatedString(id));
 }
 
