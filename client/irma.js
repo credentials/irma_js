@@ -17,6 +17,28 @@ const UserAgent = {
     iOS: "iOS",
 };
 
+const ErrorCodes = {
+    ConnectionError: {
+        Initial: "CONNERR_INITIAL",
+        Status: "CONNERR_STATUS",
+        Proof: "CONNERR_PROOF",
+    },
+    ProtocolError: {
+        Initial: "PROTERR_INITIAL",
+        Sessiondata: "PROTERR_SESSIONDATA",
+        Status: {
+            Initial: "PROTERR_STATUS_INITIAL",
+            Connected: "PROTERR_STATUS_CONNECTED",
+        },
+    },
+    InternalError: {
+        State: "INTERR_STATE",
+    },
+    Cancelled: "CANCELLED",
+    Timeout: "TIMEOUT",
+    Rejected: "REJECTED"
+}
+
 const State = {
     Initialized: "Initialized",
     PopupReady: "PopupReady",
@@ -79,15 +101,15 @@ function info() {
     console.log("IRMA API server:", apiServer);
 }
 
-function failure(msg, ...data) {
-    console.error("ERROR:", msg, ...data);
+function failure(errorcode, msg, ...data) {
+    console.error("ERROR:", errorcode, msg, ...data);
 
     state = State.Done;
     closePopup();
     cancelTimers();
 
     if (typeof(failureCallback) !== "undefined") {
-        failureCallback(msg, ...data);
+        failureCallback(errorcode, msg, ...data);
     }
 }
 
@@ -333,7 +355,7 @@ function doInitialRequest(request, success_cb, cancel_cb, failure_cb) {
     xhr.setRequestHeader("Content-Type", "text/plain");
     var currentSessionCounter = sessionCounter;
     xhr.onload = function() { handleInitialServerMessage(xhr, currentSessionCounter); };
-    xhr.onerror = function() { failure('Could not do initial request to the API server', xhr.statusText); };
+    xhr.onerror = function() { failure(ErrorCodes.ConnectionError.Initial, 'Could not do initial request to the API server', xhr.statusText); };
     xhr.send(request);
 }
 
@@ -345,7 +367,7 @@ function handleInitialServerMessage(xhr, scounter) {
 
     if (xhr.status !== 200) {
         var msg = "Initial call to server API failed. Returned status of " + xhr.status;
-        failure(msg);
+        failure(ErrorCodes.ConnectionError.Initial, msg);
         return;
     }
 
@@ -353,7 +375,7 @@ function handleInitialServerMessage(xhr, scounter) {
     try {
         sessionData = JSON.parse(xhr.responseText);
     } catch (err) {
-        failure("Cannot parse server initial message: " + xhr.responseText, err);
+        failure(ErrorCodes.ProtocolError.Initial, "Cannot parse server initial message: " + xhr.responseText, err);
         return;
     }
 
@@ -361,7 +383,7 @@ function handleInitialServerMessage(xhr, scounter) {
     sessionId = sessionData.u;
 
     if ( typeof(sessionVersion) === "undefined" || typeof(sessionId) === "undefined" ) {
-        failure("Field 'u' or 'v' missing in initial server message");
+        failure(ErrorCodes.ProtocolError.Sessiondata, "Field 'u' or 'v' missing in initial server message");
         return;
     }
 
@@ -476,7 +498,7 @@ function handleFallbackStatusUpdate(xhr) {
             timeoutSession();
             return;
         }
-        failure("Status poll from server failed. Returned status of " + xhr.status, xhr);
+        failure(ErrorCodes.ConnectionError.Status, "Status poll from server failed. Returned status of " + xhr.status, xhr);
     }
 }
 
@@ -524,7 +546,7 @@ function receiveStatusMessage(data) {
             handleStatusMessageClientConnected(msg);
             break;
         default:
-            failure("ERROR: unknown current state", state);
+            failure(ErrorCodes.InternalError.State, "ERROR: unknown current state", state);
             break;
     }
 }
@@ -539,7 +561,7 @@ function handleStatusMessageSessionStarted(msg) {
             }
             break;
         default:
-            failure("unknown status message in Initialized state", msg);
+            failure(ErrorCodes.ProtocolError.Status.Initial, "unknown status message in Initialized state", msg);
             break;
     }
 }
@@ -561,7 +583,7 @@ function handleStatusMessageClientConnected(msg) {
                 finishSigning();
             break;
         default:
-            failure("unknown status message in Connected state", msg);
+            failure(ErrorCodes.ProtocolError.Status.Connected, "unknown status message in Connected state", msg);
             break;
     }
 }
@@ -599,7 +621,7 @@ function cancelSession(cancelOld = false) {
     cancelTimers();
     if (!cancelOld) {
         closePopup();
-        cancelCallback("User cancelled authentication");
+        cancelCallback(ErrorCodes.Cancelled, "User cancelled authentication");
     }
 }
 
@@ -618,7 +640,7 @@ function timeoutSession() {
     closeWebsocket();
     closePopup();
     cancelTimers();
-    cancelCallback("Session timeout, please try again");
+    cancelCallback(ErrorCodes.Timeout, "Session timeout, please try again");
 }
 
 
@@ -635,11 +657,11 @@ function handleProofMessageFromServer(xhr) {
             successCallback(data);
         } else {
             console.log("Server rejected proof: ", token.status);
-            failureCallback("Server rejected the proof", data);
+            failureCallback(ErrorCodes.Rejected, "Server rejected the proof", data);
         }
     } else {
         // Failure
-        failure("Request for proof from server failed. Returned status of " + xhr.status, xhr);
+        failure(ErrorCodes.ConnectionError.Proof, "Request for proof from server failed. Returned status of " + xhr.status, xhr);
     }
 }
 
@@ -731,4 +753,5 @@ export {
     createUnsignedIssuanceJWT,
     createUnsignedVerificationJWT,
     createUnsignedSignatureJWT,
+    ErrorCodes,
 };
