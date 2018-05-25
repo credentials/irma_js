@@ -161,12 +161,12 @@ function sendSessionToPopup() {
         size: 230,
     }));
     $("#irma-spinner").hide();
-    $(".irma_option_container").show();
+    $(".irma-option-container").show();
 }
 
 function showMessageOnPopup(msg) {
-    $("#irma_text").text(msg);
-    $(".irma_option_container").hide();
+    $("#irma-text").text(msg);
+    $(".irma-option-container").hide();
 }
 
 function doSessionFromQr(qr, success_cb, cancel_cb, failure_cb) {
@@ -295,31 +295,31 @@ function showPopup() {
         // Add modal
         $("<div id='irma-server-modal' class='modal fade' tabindex='-1' role='dialog' aria-hidden='true'>"
         + "<div class='modal-dialog'><div class='modal-content'><div class='modal-body'>"
-        + "<div class='irma_page'>"
-        + "<div class='irma_content'>"
-        + "<img src='"+IrmaLogo+"' class='irma_logo_top' alt='IRMA logo'></img>"
-        + "<div class='irma_title'></div>"
-        + "<p id='irma_text'></p>"
+        + "<div class='irma-page'>"
+        + "<div class='irma-content'>"
+        + "<img src='"+IrmaLogo+"' class='irma-logo-top' alt='IRMA logo'></img>"
+        + "<div class='irma-title'></div>"
+        + "<p id='irma-text'></p>"
         + "<div id='irma-spinner' class='irma-load6'>"
         + "<div class='irma-loader'>Waiting for data...</div>"
         + "</div>"
-        + "<div class='irma_option_container' style='display:none;'>"
-        + "<div id='irma-qrcode' class='irma_option_box'></div>"
+        + "<div class='irma-option-container' style='display:none;'>"
+        + "<div id='irma-qrcode' class='irma-option-box'></div>"
         + "</div>"
         + "</div>"
-        + "<div class='irma_button_box'>"
-        + "<button class='irma_button' id='irma-cancel_button'>Cancel</button>"
+        + "<div class='irma-button-box'>"
+        + "<button class='irma-button' id='irma-cancel-button'>Cancel</button>"
         + "</div>"
         + "</div>"
         + "</div></div></div></div>")
             .appendTo("body");
 
         // Write informational text
-        $("#irma-server-modal .irma_title").text(serverPage.Title);
-        $("#irma-server-modal #irma_text").text(serverPage.Body);
+        $("#irma-server-modal .irma-title").text(serverPage.Title);
+        $("#irma-server-modal #irma-text").text(serverPage.Body);
 
         // Bind cancel action
-        $("#irma-cancel_button").on("click", userCancelled);
+        $("#irma-cancel-button").on("click", userCancelled);
 
         // Remove modal from dom again when it is done
         $("#irma-server-modal").on("hidden.bs.modal", function() {

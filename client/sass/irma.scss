@@ -9,16 +9,16 @@
     padding-top: 1px;
 }
 
-p#irma_text {
+p#irma-text {
     color: $irma-dark-blue;
     line-height: 130%;
 }
 
-.irma_page {
+.irma-page {
     margin: 0px auto;
 }
 
-.irma_content {
+.irma-content {
     background-color: white;
 
     position: relative;
@@ -40,7 +40,7 @@ p#irma_text {
     z-index: 1;
 }
 
-.irma_button_box {
+.irma-button-box {
     width: $irma-width + 40px;
     box-sizing: content-box;
     
@@ -51,7 +51,7 @@ p#irma_text {
     text-align: right;
 }
 
-.irma_logo_top {
+.irma-logo-top {
     position: absolute;
     left: -40px;
     top: -40px;
@@ -60,7 +60,7 @@ p#irma_text {
     z-index: 2;
 }
 
-.irma_title {
+.irma-title {
     position: absolute;
     top: -30px;
     right: 0px;
@@ -73,12 +73,12 @@ p#irma_text {
     font-size: 20px;
 }
 
-.irma_option_container {
+.irma-option-container {
     text-align: center;
     margin: 30px auto;
 }
 
-.irma_option_box {
+.irma-option-box {
     width: 230px;
     height: 230px;
     box-sizing: content-box;
@@ -94,7 +94,7 @@ p#irma_text {
     margin: 5px;
 }
 
-.irma_button {
+.irma-button {
     height: 40px;
     display: inline-block;
     box-sizing: content-box;
@@ -113,7 +113,7 @@ p#irma_text {
     cursor: pointer;
 }
 
-#irma_text {
+#irma-text {
     text-align: justify;
     padding-left: 125px;
 }
