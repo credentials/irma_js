@@ -211,7 +211,7 @@ Using the flags `--client` and `--examples` you can specify which of the subfold
 
 This project relies on one URL for verification: The client-side library needs to know the location of the API backend to perform the actual verifications and issuances. This can be specified in your webpage through the call to `IRMA.init`.
 
-For the examples in this package, an url is required during the build proces. The default is to use the demo server at `https://demo.irmacard.org/tomcat/irma_api_server/`. To use a local verification server, one can specify the server address using the `--server_url=<URL>` option (giving it the root of the servlet) or the `--api_server_url=<URL>` option (giving it the api url). For this, you might also be interested in the shortcut explained below.
+For the examples in this package, an url is required during the build proces. The default is to use the demo server at `https://demo.irmacard.org/tomcat/irma_api_server/`. To use a local verification server, one can specify the server address using the `--api_server_url=<URL>` option. For this, you might also be interested in the shortcut explained below.
 
 ## Running a local verification server
 
@@ -222,7 +222,7 @@ If you are running a local api server using the `irma_api_server` project you mi
 (Note: if you have already run `grunt` before creating this symlink, then a directory named `build` already exists. Be sure to remove it first!)
 Then simply specify the root of the servlet when running grunt:
 
-     grunt --server_url="http://<HOST>:8088/irma_api_server/"
+     grunt --api-server_url="http://<HOST>:8088/irma_api_server/"
 
 If you want to test your application using an external token, make sure that `<HOST>` is either is an ip address that the token can reach, or is resolvable to one by the token. You can then run the example by visiting
 
