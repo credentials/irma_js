@@ -148,7 +148,7 @@ function detectUserAgent() {
 
 function userCancelled(){
     cancelSession();
-    
+
     var xhr = new XMLHttpRequest();
         xhr.open("DELETE", encodeURI( actionPath + sessionId ));
         xhr.onload = function () {};
@@ -313,11 +313,11 @@ function showPopup() {
         + "</div>"
         + "</div></div></div></div>")
             .appendTo("body");
-        
+
         // Write informational text
         $("#irma-server-modal .irma_title").text(serverPage.Title);
         $("#irma-server-modal #irma_text").text(serverPage.Body);
-        
+
         // Bind cancel action
         $("#irma-cancel_button").on("click", userCancelled);
 
