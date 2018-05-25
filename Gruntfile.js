@@ -1,15 +1,11 @@
 module.exports = function (grunt) {
-    // Setup default urls for the irma api server url.
-    // These are used to configure the server pages (so it can find
-    // the API) and the examples (so they can find the authentication server)
-    var server_url, api_server_url;
-    if ( (typeof(grunt.option("server_url")) === "undefined" &&
-          typeof(grunt.option("api_server_url")) === "undefined" )) {
-        console.log("INFO: either set server_url, or" +
-                    " api_server_url to have working local phone examples");
+    // Setup default url for the irma api server url.
+    // These are used to configure the examples (so they can find the authentication server)
+    var api_server_url;
+    if (typeof(grunt.option("api_server_url")) === "undefined") {
+        console.log("INFO: set api_server_url to have working local phone examples");
     }
-    server_url = grunt.option("server_url") || "https://demo.irmacard.org/tomcat/irma_api_server/";
-    api_server_url = grunt.option("api_server_url") || server_url + "api/v2/";
+    api_server_url = grunt.option("api_server_url") || "https://demo.irmacard.org/tomcat/irma_api_server/api/v2/";
 
     var client = grunt.option("client") || false;
     var examples = grunt.option("examples") || false;
