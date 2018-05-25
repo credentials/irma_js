@@ -18,10 +18,11 @@ This javascript package contains two parts:
 
 In case you quickly want to get started with setting up IRMA verification for your website please proceed as follows. First, you need an API server. For testing, feel free to user our API server. It is hosted at `https://demo.irmcard.org/tomcat/irma_api_server/`. (Please note that it only allows verifies and issues credentials in the demo domain.)
 
-First, we load the IRMA client-side Javascript library:
+First, we load the IRMA client-side Javascript library and css:
 
 ```html
-<script src="https://demo.irmacard.org/tomcat/irma_api_server/client/irma.js" type="text/javascript"></script>
+<link rel="stylesheet" href="https://path/to/webserver/client/irma.css">
+<script src="https://path/to/webserver/client/irma.js" type="text/javascript"></script>
 ```
 
 Next, we tell `irma.js` to initialize, and where to find the API server
@@ -82,11 +83,10 @@ A full working minimal example is:
 ```HTML
 <html>
     <head>
-        <script src="https://code.jquery.com/jquery-3.2.1.min.js" type="text/javascript"></script>
-        <script src="https://demo.irmacard.org/tomcat/irma_api_server/client/irma.js" type="text/javascript"></script>
+        <link rel="stylesheet" href="https://path/to/webserver/client/irma.css">
+        <script src="https://path/to/webserver/client/irma.js" type="text/javascript"></script>
         <script type="text/javascript">
-            IRMA.init("https://demo.irmacard.org/tomcat/irma_api_server/api/v2/", 
-                      "https://demo.irmacard.org/tomcat/irma_api_server/server/");
+            IRMA.init("https://demo.irmacard.org/tomcat/irma_api_server/api/v2/");
             var sprequest = {
                 "request": {
                     "content": [
@@ -205,7 +205,7 @@ to build the libraries and examples. See below for how to setup server URLs for 
 
 to keep rebuilding the files as they change. If you specify neither `build` nor `watch`, `build watch` is implied.
 
-Using the flags `--client`, `--server` and `--examples` you can specify which of the three subfolders should be built. If you specify none of these, all three will be built.
+Using the flags `--client` and `--examples` you can specify which of the subfolders should be built. If you specify none of these, all will be built.
 
 ## URL for the api
 
