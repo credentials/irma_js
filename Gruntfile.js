@@ -36,11 +36,11 @@ module.exports = function (grunt) {
 
         watchTasks.htmlfiles = {
             files: [ "./examples/**/*.html" ],
-            tasks: ["string-replace"],
+            tasks: ["copy"],
         };
         watchTasks.exampleScripts = {
             files: ["./examples/*.js"],
-            tasks: ["copy"],
+            tasks: ["string-replace"],
         };
     }
 
