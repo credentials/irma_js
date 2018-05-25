@@ -34,7 +34,7 @@ $(function() {
                              + '<strong>Success:</strong> Credentials issued </div>');
     };
     
-    IRMA.init("<IRMA_API_SERVER>", "<IRMA_WEB_SERVER>");
+    IRMA.init("<IRMA_API_SERVER>");
 
     $("#irma_btn").on("click", function() {
         // Clear errors

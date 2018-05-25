@@ -2,33 +2,30 @@
 @import "variables.scss";
 @import "loader.scss";
 
-body {
+#irma-server-modal .modal-content {
     font: 100% $font-stack;
     font-size: 14px;
     background-color: $irma-background-color;
     padding-top: 1px;
 }
 
-p {
+p#irma-text {
     color: $irma-dark-blue;
     line-height: 130%;
 }
 
-p.error {
-    color: $irma-red;
-}
-
-.irma_page {
+.irma-page {
     margin: 0px auto;
 }
 
-.irma_content {
+.irma-content {
     background-color: white;
 
     position: relative;
     left: 0px;
     width: $irma-width;
     margin: $irma-margin;
+    box-sizing: content-box;
 
     // Border
     border-style: solid;
@@ -43,8 +40,10 @@ p.error {
     z-index: 1;
 }
 
-.irma_button_box {
+.irma-button-box {
     width: $irma-width + 40px;
+    box-sizing: content-box;
+    
     padding-top: 5px;
     margin-left: $irma-margin;
     margin-top: -$irma-margin;
@@ -52,19 +51,21 @@ p.error {
     text-align: right;
 }
 
-.irma_logo_top {
+.irma-logo-top {
     position: absolute;
     left: -40px;
     top: -40px;
     width: 160px;
+    box-sizing: content-box;
     z-index: 2;
 }
 
-.irma_title {
+.irma-title {
     position: absolute;
     top: -30px;
     right: 0px;
     height: 40px;
+    box-sizing: content-box;
     text-align: right;
     color: white;
     font-weight: 700;
@@ -72,14 +73,15 @@ p.error {
     font-size: 20px;
 }
 
-.irma_option_container {
+.irma-option-container {
     text-align: center;
     margin: 30px auto;
 }
 
-.irma_option_box {
+.irma-option-box {
     width: 230px;
     height: 230px;
+    box-sizing: content-box;
 
     border-style: solid;
     border-width: medium;
@@ -92,9 +94,10 @@ p.error {
     margin: 5px;
 }
 
-.irma_button {
+.irma-button {
     height: 40px;
     display: inline-block;
+    box-sizing: content-box;
 
     color: white;
     font-weight: 700;
@@ -110,7 +113,7 @@ p.error {
     cursor: pointer;
 }
 
-#irma_text {
+#irma-text {
     text-align: justify;
     padding-left: 125px;
 }
