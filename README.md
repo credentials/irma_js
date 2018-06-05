@@ -187,13 +187,11 @@ Some notes on development
 First setup the development environment:
 
     npm install -g grunt-cli
-    npm install -g bower
     npm install compass     # unchecked
 
-by installing grunt and bower. Then run
+by installing grunt. Then run
 
     npm install
-    bower install
 
 to install the node dependencies and JavaScript libraries. Finally run
 
