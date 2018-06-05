@@ -178,6 +178,16 @@ IRMA.sign(sprequest, success, warning, error);
 ```
 This will start the protocol in the same way as in the verify case. Note that the web token that will be returned in the `success` case contains the IRMA signature.
 
+## Multilanguage support
+
+The IRMA javascript client supports localisation of all its interface elements to other languages. Translations are provided in the `client/languages` folder. During the call to `IRMA.init()`, a second argument can be provided to localize the interface to a different language. For example, initializing using
+
+```javascript
+IRMA.init("<URL>", "nl");
+```
+
+localizes the interface to the dutch language. When not provided, the IRMA javascript client defaults to english. The interface language can also be changed at runtime using `IRMA.setLang("<language>")`.
+
 # Development
 
 Some notes on development
