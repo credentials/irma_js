@@ -195,6 +195,7 @@ function sendSessionToPopup() {
     $("#irma-qrcode").empty().append(kjua({
         text: JSON.stringify(sessionPackage),
         size: 230,
+        crisp: false,
     }));
     $("#irma-spinner").hide();
     $(".irma-option-container").show();
