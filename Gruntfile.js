@@ -22,7 +22,7 @@ module.exports = function (grunt) {
         tasks.push("browserify:client", "uglify", "sass");
 
         watchTasks.clientScripts = {
-            files: ["./client/*.js"],
+            files: ["./client/**/*.js"],
             tasks: ["browserify:client", "uglify"],
         };
         watchTasks.sass = {
