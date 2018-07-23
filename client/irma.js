@@ -459,11 +459,7 @@ function handleInitialServerMessage(xhr, scounter) {
 }
 
 function startSession() {
-    try {
-        setupClientMonitoring();
-    } catch (Err) {
-        log(Loglevel.Info, "Websocket setup failed");
-    }
+    setupClientMonitoring();
     setupFallbackMonitoring();
     setupTimeoutMonitoring();
     connectClientToken();
@@ -474,7 +470,11 @@ function startSession() {
 
 function setupClientMonitoring() {
     var url = apiServer.replace(/^http/, "ws") + "status/" + sessionId;
-    statusWebsocket = new WebSocket(url);
+    try {
+        statusWebsocket = new WebSocket(url);
+    } catch (Err) {
+        log(Loglevel.Info, "Websocket setup failed");
+    }
     statusWebsocket.onmessage = receiveStatusMessage;
 }
 
