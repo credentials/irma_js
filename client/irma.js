@@ -459,7 +459,11 @@ function handleInitialServerMessage(xhr, scounter) {
 }
 
 function startSession() {
-    setupClientMonitoring();
+    try {
+        setupClientMonitoring();
+    } catch (Err) {
+        log(Loglevel.Info, "Websocket setup failed");
+    }
     setupFallbackMonitoring();
     setupTimeoutMonitoring();
     connectClientToken();
