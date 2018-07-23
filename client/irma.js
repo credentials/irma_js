@@ -470,7 +470,11 @@ function startSession() {
 
 function setupClientMonitoring() {
     var url = apiServer.replace(/^http/, "ws") + "status/" + sessionId;
-    statusWebsocket = new WebSocket(url);
+    try {
+        statusWebsocket = new WebSocket(url);
+    } catch (Err) {
+        log(Loglevel.Info, "Websocket setup failed");
+    }
     statusWebsocket.onmessage = receiveStatusMessage;
 }
 
