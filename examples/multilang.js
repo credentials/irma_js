@@ -18,7 +18,7 @@ $(function() {
     };
 
     function init() {
-        IRMA.init("<IRMA_API_SERVER>", $("#change_language_sel").val());
+        IRMA.init("<IRMA_API_SERVER>", {lang: $("#change_language_sel").val()});
         
         console.log("Init called!");
         var btn = document.getElementById("try_irma_btn")
