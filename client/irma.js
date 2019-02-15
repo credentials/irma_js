@@ -584,7 +584,7 @@ function connectClientToken() {
         var intent = "intent://" + url + "#Intent;package=org.irmacard.cardemu;scheme=cardemu;"
             + "l.timestamp=" + Date.now() + ";"
             + "S.qr=" + encodeURIComponent(JSON.stringify(sessionPackage)) + ";"
-            + "S.browser_fallback_url=http%3A%2F%2Fapp.irmacard.org%2Fverify;end";
+            + "S.browser_fallback_url=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dorg.irmacard.cardemu;end";
         window.location.href = intent;
     } else if (ua === UserAgent.iOS) {
         window.location.href = "irma://" + url;
