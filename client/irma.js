@@ -255,7 +255,7 @@ function issue(jwt, success_cb, cancel_cb, failure_cb) {
     checkInit();
 
     action = Action.Issuing;
-    actionPath = apiServer + (apiServerNew ? "session/" : "issue/");
+    actionPath = apiServer + (apiServerNew ? "session" : "issue/");
     doInitialRequest(jwt, success_cb, cancel_cb, failure_cb);
 }
 
@@ -284,7 +284,7 @@ function verify(request, success_cb, cancel_cb, failure_cb) {
     }
 
     action = Action.Verifying;
-    actionPath = apiServer + (apiServerNew ? "session/" : "verification/");
+    actionPath = apiServer + (apiServerNew ? "session" : "verification/");
     doInitialRequest(jwt, success_cb, cancel_cb, failure_cb);
 }
 
@@ -299,7 +299,7 @@ function sign(signatureRequest, success_cb, cancel_cb, failure_cb) {
     checkInit();
 
     action = Action.Signing;
-    actionPath = apiServer + (apiServerNew ? "session/" : "signature/");
+    actionPath = apiServer + (apiServerNew ? "session" : "signature/");
     doInitialRequest(signatureRequest, success_cb, cancel_cb, failure_cb);
 }
 
@@ -449,17 +449,23 @@ function handleInitialServerMessage(xhr, scounter) {
         return;
     }
 
-    var sessionVersion = sessionData.v;
-    sessionId = sessionData.u;
+    if (apiServerNew) {
+        sessionId = sessionData.token;
+        sessionData = sessionData.sessionPtr;
+    } else {
+        sessionId = sessionData.u;
+    }
 
-    if ( typeof(sessionVersion) === "undefined" || typeof(sessionId) === "undefined" ) {
+    if (typeof(sessionId) === "undefined" ) {
         failure(ErrorCodes.ProtocolError.Sessiondata, "Field 'u' or 'v' missing in initial server message");
         return;
     }
 
     log(Loglevel.Info, "Setting sessionPackage");
     sessionPackage = sessionData;
-    sessionPackage.u = actionPath + sessionId;
+    if (!apiServerNew) {
+        sessionPackage.u = actionPath + sessionId;
+    }
     log(Loglevel.Info, "sessionPackage", sessionPackage);
 
     startSession();
@@ -490,7 +496,7 @@ function setupClientMonitoring() {
  * websocket is not active.
  */
 function setupFallbackMonitoring() {
-    var status_url = actionPath + sessionId + "/status";
+    var status_url = actionPath + (apiServerNew?"/":"") + sessionId + "/status";
 
     var checkVerificationStatus = function () {
         if ( state === State.Done || state === State.Cancelled ) {
@@ -672,14 +678,14 @@ function finishIssuance() {
 
 function finishVerification() {
     var xhr = new XMLHttpRequest();
-    xhr.open("GET", encodeURI( actionPath + sessionId + (apiServerNew ? "result-jwt" : "/getproof")));
+    xhr.open("GET", encodeURI( actionPath + (apiServerNew?"/":"") + sessionId + (apiServerNew ? "/getproof" : "/getproof")));
     xhr.onload = function () { handleProofMessageFromServer(xhr); };
     xhr.send();
 }
 
 function finishSigning() {
     var xhr = new XMLHttpRequest();
-    xhr.open("GET", encodeURI( actionPath + sessionId + (apiServerNew ? "/result-jwt" : "/getsignature")));
+    xhr.open("GET", encodeURI( actionPath + (apiServerNew?"/":"") + sessionId + (apiServerNew ? "/getproof" : "/getsignature")));
     xhr.onload = function () { handleProofMessageFromServer(xhr); };
     xhr.send();
 }
