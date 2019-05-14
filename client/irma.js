@@ -76,6 +76,7 @@ const DefaultOptions = {
     lang: defaultLang,
     loglevel: Loglevel.Info,
     newServer: false,
+    returnURL: "",
 };
 
 // Data for irma logo
@@ -104,6 +105,7 @@ var apiServer;
 var apiServerNew;
 var action;
 var actionPath;
+var returnURL;
 
 var statusWebsocket;
 
@@ -460,6 +462,9 @@ function handleInitialServerMessage(xhr, scounter) {
         failure(ErrorCodes.ProtocolError.Sessiondata, "Field 'u' or 'v' missing in initial server message");
         return;
     }
+
+    if (returnURL)
+        sessionData.returnURL = returnURL;
 
     log(Loglevel.Info, "Setting sessionPackage");
     sessionPackage = sessionData;
@@ -818,6 +823,7 @@ function init(irmaapiserver, options) {
     detectUserAgent();
     setLang(options.lang);
     apiServerNew = options.newServer;
+    returnURL = options.returnURL;
     librarySetup = true;
 }
 
