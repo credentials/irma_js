@@ -45,7 +45,7 @@ module.exports = function (grunt) {
     }
 
     var replacements = [{
-        pattern: "<IRMA_API_SERVER>",
+        pattern: /<IRMA_API_SERVER>/g,
         replacement: api_server_url,
     }];
 

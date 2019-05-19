@@ -1,0 +1,38 @@
+<html>
+    <head>
+        <title>IRMA Client demo page</title>
+
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="../components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+
+        <link rel="stylesheet" href="custom-button.css">
+        <link rel="stylesheet" href="../client/irma.css">
+        <script type="text/javascript" src="../components/jquery/dist/jquery.js"></script>
+        <script type="text/javascript" src="../components/jwt-decode/build/jwt-decode.js"></script>
+        <script type="text/javascript" src="../client/irma.js"></script>
+        <script type="text/javascript" src="universal-link.js"></script>
+    </head>
+    <body>
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12 col-md-8 col-lg-6 col-md-offset-2 col-lg-offset-3">
+                    <h2>Simple verification</h2>
+                    <p>
+                        This demo discloses your first name and whether
+                        you are 12 years old or more. It shows the resulting
+                        JSON web token.
+                    </p>
+                    <a id="try_irma_btn" class="btn btn-primary">Verify with IRMA</a>
+
+                    <h3>Result</h3>
+                    <h2 id="result_status"></h2>
+                    <p>Raw JSON web token:</p>
+                    <pre id="token-raw"></pre>
+
+                    <p>Content of JSON web token:</p>
+                    <pre id="token-content"></pre>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
