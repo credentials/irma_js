@@ -600,8 +600,16 @@ function cancelTimers () {
 }
 
 function connectClientToken() {
-    if (ua === UserAgent.Android || ua === UserAgent.iOS)
-        window.location.href = "https://irma.app/-/session#" + encodeURIComponent(JSON.stringify(sessionPackage));
+    var url = "qr/json/" + encodeURIComponent(JSON.stringify(sessionPackage));
+    if (userAgent === UserAgents.Android) {
+        var intent = "intent://" + url + "#Intent;package=org.irmacard.cardemu;scheme=cardemu;"
+            + "l.timestamp=" + Date.now() + ";"
+            + "S.qr=" + encodeURIComponent(JSON.stringify(sessionPackage)) + ";"
+            + "S.browser_fallback_url=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dorg.irmacard.cardemu;end";
+        window.location.href = intent;
+    } else if (userAgent === UserAgents.iOS) {
+        window.location.href = "irma://" + url;
+    }
 }
 
 function receiveStatusMessage(data) {
