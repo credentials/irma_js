@@ -17,7 +17,7 @@ const Action = {
     Signing: "Signing",
 };
 
-const UserAgent = {
+const UserAgents = {
     Desktop: "Desktop",
     Android: "Android",
     iOS: "iOS",
@@ -91,7 +91,7 @@ var sessionTimedOut = false;
 // State to manage setup
 var librarySetup = false;
 
-var ua;
+var userAgent;
 
 var sessionPackage;
 var sessionCounter = 0;
@@ -206,14 +206,14 @@ function getSetupFromMetas() {
 function detectUserAgent() {
     if ( /Android/i.test(navigator.userAgent) ) {
         log(Loglevel.Info, "Detected Android");
-        ua = UserAgent.Android;
+        userAgent = UserAgents.Android;
     } else if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) {
         // https://stackoverflow.com/questions/9038625/detect-if-device-is-ios
         log(Loglevel.Info, "Detected iOS");
-        ua = UserAgent.iOS;
+        userAgent = UserAgents.iOS;
     } else {
         log(Loglevel.Info, "Neither Android nor iOS, assuming desktop");
-        ua = UserAgent.Desktop;
+        userAgent = UserAgents.Desktop;
     }
 }
 
@@ -241,7 +241,7 @@ function showMessageOnPopup(id) {
     $(".irma-option-container").hide();
 }
 
-function doSessionFromQr(qr, success_cb, cancel_cb, failure_cb) {
+function doSessionFromQr(qr, success_cb, cancel_cb, failure_cb, connectToken) {
     clearState();
     showPopup();
     setAndCheckCallbacks(success_cb, cancel_cb, failure_cb);
@@ -250,7 +250,7 @@ function doSessionFromQr(qr, success_cb, cancel_cb, failure_cb) {
     apiServer = actionPath.substr(0, actionPath.lastIndexOf("/")) + "/"; // Also strip session type (e.g., "issue")
     sessionId = qr.u.substr(qr.u.lastIndexOf("/") + 1, qr.u.length);
     sessionPackage = qr;
-    startSession();
+    startSession(connectToken);
 }
 
 function issue(jwt, success_cb, cancel_cb, failure_cb) {
@@ -261,11 +261,11 @@ function issue(jwt, success_cb, cancel_cb, failure_cb) {
     doInitialRequest(jwt, success_cb, cancel_cb, failure_cb);
 }
 
-function issueFromQr(qr, success_cb, cancel_cb, failure_cb) {
+function issueFromQr(qr, success_cb, cancel_cb, failure_cb, connectToken) {
     checkInit();
 
     action = Action.Issuing;
-    doSessionFromQr(qr, success_cb, cancel_cb, failure_cb);
+    doSessionFromQr(qr, success_cb, cancel_cb, failure_cb, connectToken);
 }
 
 function verify(request, success_cb, cancel_cb, failure_cb) {
@@ -290,11 +290,11 @@ function verify(request, success_cb, cancel_cb, failure_cb) {
     doInitialRequest(jwt, success_cb, cancel_cb, failure_cb);
 }
 
-function verifyFromQr(qr, success_cb, cancel_cb, failure_cb) {
+function verifyFromQr(qr, success_cb, cancel_cb, failure_cb, connectToken) {
     checkInit();
 
     action = Action.Verifying;
-    doSessionFromQr(qr, success_cb, cancel_cb, failure_cb);
+    doSessionFromQr(qr, success_cb, cancel_cb, failure_cb, connectToken);
 }
 
 function sign(signatureRequest, success_cb, cancel_cb, failure_cb) {
@@ -305,11 +305,11 @@ function sign(signatureRequest, success_cb, cancel_cb, failure_cb) {
     doInitialRequest(signatureRequest, success_cb, cancel_cb, failure_cb);
 }
 
-function signFromQr(qr, success_cb, cancel_cb, failure_cb) {
+function signFromQr(qr, success_cb, cancel_cb, failure_cb, connectToken) {
     checkInit();
 
     action = Action.Signing;
-    doSessionFromQr(qr, success_cb, cancel_cb, failure_cb);
+    doSessionFromQr(qr, success_cb, cancel_cb, failure_cb, connectToken);
 }
 
 function clearState() {
@@ -351,7 +351,7 @@ function setAndCheckCallbacks(success_cb, cancel_cb, failure_cb) {
 }
 
 function showPopup() {
-    if (ua === UserAgent.Desktop) {
+    if (userAgent === UserAgents.Desktop) {
         // Popup code
         log(Loglevel.Info, "Trying to open popup");
         var serverPage;
@@ -476,13 +476,16 @@ function handleInitialServerMessage(xhr, scounter) {
     startSession();
 }
 
-function startSession() {
+function startSession(connectToken = true) {
     setupClientMonitoring();
     setupFallbackMonitoring();
     setupTimeoutMonitoring();
-    connectClientToken();
 
-    sendSessionToPopup();
+    if (connectToken) {
+        connectClientToken();
+        sendSessionToPopup();
+    }
+
     state = State.SessionStarted;
 }
 
@@ -490,10 +493,10 @@ function setupClientMonitoring() {
     var url = apiServer.replace(/^http/, "ws") + "status/" + sessionId;
     try {
         statusWebsocket = new WebSocket(url);
+        statusWebsocket.onmessage = receiveStatusMessage;
     } catch (Err) {
         log(Loglevel.Info, "Websocket setup failed");
     }
-    statusWebsocket.onmessage = receiveStatusMessage;
 }
 
 /*
@@ -515,6 +518,7 @@ function setupFallbackMonitoring() {
             var xhr = new XMLHttpRequest();
             xhr.open("GET", encodeURI(status_url + "?" + Math.random()));
             xhr.onload = function () { handleFallbackStatusUpdate(xhr); };
+            xhr.onerror = function(e) { console.warn(e); };
             xhr.send();
         }
     };
@@ -696,7 +700,7 @@ function finishSigning() {
 }
 
 function closePopup() {
-    if (ua !== UserAgent.Android) {
+    if (userAgent !== UserAgents.Android) {
         log(Loglevel.Info, "Closing popup");
         $("#irma-server-modal").modal("hide");
     }
@@ -857,4 +861,6 @@ export {
     createUnsignedVerificationJWT,
     createUnsignedSignatureJWT,
     ErrorCodes,
+    UserAgents,
+    userAgent,
 };
